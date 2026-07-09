@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import ClientFooter from "@/components/ClientFooter";
 import CookieBanner from "@/components/CookieBanner";
 import { SteamProvider } from "@/context/SteamContext";
+import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 
 export const metadata: Metadata = {
   title: "Atlas RP - Loja Oficial",
@@ -18,14 +19,16 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <SteamProvider>
-          <Header />
-          <main className="flex-1 pt-16">
-            {children}
-          </main>
-          <ClientFooter />
-          <CookieBanner />
-        </SteamProvider>
+        <StyledComponentsRegistry>
+          <SteamProvider>
+            <Header />
+            <main className="flex-1 pt-16">
+              {children}
+            </main>
+            <ClientFooter />
+            <CookieBanner />
+          </SteamProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

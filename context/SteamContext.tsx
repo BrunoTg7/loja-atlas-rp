@@ -28,7 +28,7 @@ export function SteamProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/auth/session", { credentials: "same-origin" });
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
