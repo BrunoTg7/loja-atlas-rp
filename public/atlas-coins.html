@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Coins - Loja de Moedas Virtuais</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1510 50%, #0a0a0a 100%);
+      min-height: 100vh;
+      font-family: 'Rajdhani', sans-serif;
+      padding: 40px 20px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .page-title h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+      letter-spacing: 4px;
+    }
+
+    .page-title h1 span {
+      background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-title p {
+      color: #8a7d6b;
+      font-size: 1.2rem;
+      margin-top: 10px;
+      letter-spacing: 2px;
+    }
+
+    .coins-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ==================== COIN CARD ==================== */
+    .coin-card {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      perspective: 1000px;
+    }
+
+    .coin-card-inner {
+      position: relative;
+      background: linear-gradient(180deg, #1a1714 0%, #0d0b09 100%);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      clip-path: polygon(
+        0 20px,
+        20px 0,
+        calc(100% - 20px) 0,
+        100% 20px,
+        100% calc(100% - 20px),
+        calc(100% - 20px) 100%,
+        20px 100%,
+        0 calc(100% - 20px)
+      );
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+    }
+
+    .coin-card:hover .coin-card-inner {
+      transform: translateY(-10px) scale(1.02);
+    }
+
+    /* Golden border effect */
+    .coin-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 25%, #d4af37 50%, #8b7021 75%, #d4af37 100%);
+      clip-path: polygon(
+        0 20px,
+        20px 0,
+        calc(100% - 20px) 0,
+        100% 20px,
+        100% calc(100% - 20px),
+        calc(100% - 20px) 100%,
+        20px 100%,
+        0 calc(100% - 20px)
+      );
+      z-index: -1;
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% {
+        filter: brightness(1) drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+      }
+      50% {
+        filter: brightness(1.3) drop-shadow(0 0 25px rgba(212, 175, 55, 0.8));
+      }
+    }
+
+    /* Glow overlay */
+    .coin-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center top, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ==================== CARD CONTENT ==================== */
+    .card-content {
+      position: relative;
+      padding: 25px 20px 20px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    /* Coin amount */
+    .coin-amount {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+      line-height: 1.1;
+    }
+
+    .coin-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+    }
+
+    /* ==================== COIN ILLUSTRATION ==================== */
+    .coin-illustration {
+      position: relative;
+      height: 140px;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .coin-stack {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+
+    .coin {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #d4af37 0%, #8b7021 50%, #d4af37 100%);
+      box-shadow: 
+        inset 0 2px 4px rgba(244, 228, 188, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(212, 175, 55, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: coinFloat 3s ease-in-out infinite;
+    }
+
+    .coin::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 2px solid rgba(244, 228, 188, 0.3);
+    }
+
+    .coin::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(244, 228, 188, 0.2) 0%, transparent 50%);
+    }
+
+    .coin-symbol {
+      position: relative;
+      z-index: 2;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #1a1510;
+      text-shadow: 1px 1px 2px rgba(244, 228, 188, 0.5);
+    }
+
+    .coin:nth-child(1) {
+      top: 30px;
+      left: 15px;
+      animation-delay: 0s;
+    }
+
+    .coin:nth-child(2) {
+      top: 20px;
+      left: 25px;
+      animation-delay: 0.2s;
+    }
+
+    .coin:nth-child(3) {
+      top: 10px;
+      left: 35px;
+      animation-delay: 0.4s;
+    }
+
+    .coin:nth-child(4) {
+      top: 0;
+      left: 15px;
+      animation-delay: 0.6s;
+      z-index: 4;
+      width: 100px;
+      height: 100px;
+    }
+
+    @keyframes coinFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Shine effect */
+    .coin-shine {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+      border-radius: 50%;
+      animation: shine 3s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+
+    /* ==================== PRICE RIBBON ==================== */
+    .price-ribbon {
+      position: relative;
+      margin: 0 -20px;
+      padding: 15px 20px;
+      background: linear-gradient(90deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
+      clip-path: polygon(0 0, 100% 0, 98% 50%, 100% 100%, 0 100%, 2% 50%);
+    }
+
+    .price-ribbon.purple {
+      background: linear-gradient(90deg, #6b21a8 0%, #a855f7 50%, #6b21a8 100%);
+    }
+
+    .price-ribbon.blue {
+      background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+    }
+
+    .price-ribbon.red {
+      background: linear-gradient(90deg, #991b1b 0%, #ef4444 50%, #991b1b 100%);
+    }
+
+    .price-ribbon.green {
+      background: linear-gradient(90deg, #166534 0%, #22c55e 50%, #166534 100%);
+    }
+
+    .price-ribbon.teal {
+      background: linear-gradient(90deg, #115e59 0%, #14b8a6 50%, #115e59 100%);
+    }
+
+    .price-ribbon.orange {
+      background: linear-gradient(90deg, #9a3412 0%, #f97316 50%, #9a3412 100%);
+    }
+
+    .price-ribbon.crimson {
+      background: linear-gradient(90deg, #881337 0%, #f43f5e 50%, #881337 100%);
+    }
+
+    .price-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #0a0a0a;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+      letter-spacing: 1px;
+    }
+
+    .price-currency {
+      font-size: 1rem;
+      font-weight: 700;
+      vertical-align: super;
+      margin-right: 2px;
+    }
+
+    /* ==================== PIX BADGE ==================== */
+    .pix-badge {
+      margin: 15px 0 10px;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #14532d 0%, #166534 50%, #14532d 100%);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .pix-badge-icon {
+      width: 16px;
+      height: 16px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .pix-badge-text {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #86efac;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ==================== BADGES ==================== */
+    .badge-popular {
+      position: absolute;
+      top: 15px;
+      right: -35px;
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #dc2626 100%);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 8px 40px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transform: rotate(45deg);
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.5);
+    }
+
+    .badge-best-value {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 30%, #d4af37 70%, #8b7021 100%);
+      color: #0a0a0a;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 6px 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 10;
+      clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% {
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6);
+      }
+      50% {
+        box-shadow: 0 4px 30px rgba(212, 175, 55, 0.9);
+      }
+    }
+
+    /* ==================== CARD FOOTER ==================== */
+    .card-footer {
+      padding: 15px 20px 20px;
+      text-align: center;
+    }
+
+    .buy-button {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #d4af37 0%, #8b7021 100%);
+      border: none;
+      clip-path: polygon(
+        0 6px,
+        6px 0,
+        calc(100% - 6px) 0,
+        100% 6px,
+        100% calc(100% - 6px),
+        calc(100% - 6px) 100%,
+        6px 100%,
+        0 calc(100% - 6px)
+      );
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0a0a0a;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .buy-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .buy-button:hover::before {
+      left: 100%;
+    }
+
+    .buy-button:hover {
+      background: linear-gradient(135deg, #f4e4bc 0%, #d4af37 100%);
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+    }
+
+    .buy-button.purple {
+      background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+      color: #fff;
+    }
+
+    .buy-button.purple:hover {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    }
+
+    .buy-button.blue {
+      background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+      color: #fff;
+    }
+
+    .buy-button.blue:hover {
+      background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+    }
+
+    .buy-button.red {
+      background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
+      color: #fff;
+    }
+
+    .buy-button.red:hover {
+      background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+    }
+
+    .buy-button.green {
+      background: linear-gradient(135deg, #16a34a 0%, #14532d 100%);
+      color: #fff;
+    }
+
+    .buy-button.green:hover {
+      background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+    }
+
+    .buy-button.teal {
+      background: linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+      color: #fff;
+    }
+
+    .buy-button.teal:hover {
+      background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
+    }
+
+    .buy-button.orange {
+      background: linear-gradient(135deg, #ea580c 0%, #7c2d12 100%);
+      color: #fff;
+    }
+
+    .buy-button.orange:hover {
+      background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    }
+
+    .buy-button.crimson {
+      background: linear-gradient(135deg, #e11d48 0%, #881337 100%);
+      color: #fff;
+    }
+
+    .buy-button.crimson:hover {
+      background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+    }
+
+    /* ==================== SPECIAL STYLES ==================== */
+    .coin-card.premium .coin-card-inner {
+      background: linear-gradient(180deg, #1f1a14 0%, #0d0b09 50%, #1a1510 100%);
+    }
+
+    .coin-card.premium::before {
+      background: linear-gradient(135deg, #f4e4bc 0%, #d4af37 25%, #f4e4bc 50%, #d4af37 75%, #f4e4bc 100%);
+      animation: premiumBorderGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes premiumBorderGlow {
+      0%, 100% {
+        filter: brightness(1.2) drop-shadow(0 0 20px rgba(244, 228, 188, 0.6));
+      }
+      50% {
+        filter: brightness(1.5) drop-shadow(0 0 40px rgba(244, 228, 188, 0.9));
+      }
+    }
+
+    .coin-card.premium .coin {
+      box-shadow: 
+        inset 0 2px 4px rgba(244, 228, 188, 0.6),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        0 0 50px rgba(244, 228, 188, 0.5);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .page-title h1 {
+        font-size: 2rem;
+      }
+
+      .coins-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+      }
+
+      .coin-card {
+        max-width: 320px;
+      }
+    }
+
+    /* ==================== PARTICLES ==================== */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #d4af37;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: particleFloat 15s infinite linear;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <div class="page-title">
+    <h1>ATLAS <span>COINS</span></h1>
+    <p>Moedas Virtuais Premium</p>
+  </div>
+
+  <div class="coins-grid">
+    <!-- 100 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">100</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon">
+          <div class="price-value"><span class="price-currency">R$</span>6,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 250 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">250</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon purple">
+          <div class="price-value"><span class="price-currency">R$</span>14,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button purple">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 500 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">500</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon blue">
+          <div class="price-value"><span class="price-currency">R$</span>27,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button blue">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 600 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">600</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon red">
+          <div class="price-value"><span class="price-currency">R$</span>32,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button red">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.000 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">1.000</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon green">
+          <div class="price-value"><span class="price-currency">R$</span>54,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button green">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.500 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">1.500</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon teal">
+          <div class="price-value"><span class="price-currency">R$</span>79,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button teal">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.000 Atlas Coins - POPULAR -->
+    <div class="coin-card">
+      <div class="badge-popular">POPULAR</div>
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">2.000</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon orange">
+          <div class="price-value"><span class="price-currency">R$</span>94,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">Pague via PIX</div>
+          </div>
+          <button class="buy-button orange">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.000 Atlas Coins -->
+    <div class="coin-card">
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">5.000</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon crimson">
+          <div class="price-value"><span class="price-currency">R$</span>199,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">10% OFF COM PIX ACIMA DE R$99</div>
+          </div>
+          <button class="buy-button crimson">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10.000 Atlas Coins - BEST VALUE (PREMIUM) -->
+    <div class="coin-card premium">
+      <div class="badge-best-value">★ MELHOR CUSTO BENEFÍCIO ★</div>
+      <div class="coin-card-inner">
+        <div class="card-content">
+          <div class="coin-amount">10.000</div>
+          <div class="coin-label">Atlas Coins</div>
+          <div class="coin-illustration">
+            <div class="coin-stack">
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+              <div class="coin"><span class="coin-symbol">A</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="price-ribbon">
+          <div class="price-value"><span class="price-currency">R$</span>349,90</div>
+        </div>
+        <div class="card-footer">
+          <div class="pix-badge">
+            <div class="pix-badge-icon">✓</div>
+            <div class="pix-badge-text">10% OFF COM PIX — ECONOMIZE R$34,99</div>
+          </div>
+          <button class="buy-button">COMPRAR AGORA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+  </script>
+</body>
+</html>
