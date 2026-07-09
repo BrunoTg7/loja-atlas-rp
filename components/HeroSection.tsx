@@ -73,7 +73,7 @@ export default function HeroSection() {
             style={{ scale: bgScale }}
           >
             <img
-              src="/Imagens/fundo1.png"
+              src="/Imagens/fundo1.webp"
               alt="Atlas RP Background"
               className="w-full h-full object-cover"
             />
@@ -91,7 +91,7 @@ export default function HeroSection() {
           }}
         >
           <img
-            src="/Imagens/personagem1.png"
+            src="/Imagens/personagem1.webp"
             alt="Atlas RP Character"
             className="w-full h-auto max-h-[80vh] object-contain object-bottom drop-shadow-[0_0_50px_rgba(212,175,55,0.3)]"
           />
@@ -119,7 +119,7 @@ export default function HeroSection() {
               className="shrink-0 mt-12 md:mt-18 lg:mt-24 xl:mt-32 -ml-4 md:-ml-8 lg:-ml-12"
             >
               <img
-                src="/Imagens/logo-atlas-rp.png"
+                src="/Imagens/logo-atlas-rp.webp"
                 alt="Atlas RP"
                 className="h-56 md:h-64 lg:h-72 xl:h-[28rem] object-contain drop-shadow-[0_0_80px_rgba(255,46,68,0.5)]"
               />

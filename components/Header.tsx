@@ -41,7 +41,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <div className="relative h-16 w-auto">
             <img
-              src="/Imagens/logo-atlas-rp.png"
+              src="/Imagens/logo-atlas-rp.webp"
               alt="Atlas RP Logo"
               className="h-full w-40 object-contain"
             />

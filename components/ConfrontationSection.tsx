@@ -39,11 +39,11 @@ const HalfImage = styled(motion.div)<{ $side: "left" | "right" }>`
     $side === "left"
       ? `
     left: 0;
-    background-image: url('/Imagens/policia.png');
+    background-image: url('/Imagens/policia.webp');
   `
       : `
     right: 0;
-    background-image: url('/Imagens/bandido.png');
+    background-image: url('/Imagens/bandido.webp');
   `}
 `;
 
