@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useServerInsertedHTML } from "next/navigation";
-import { createGlobalStyle, ServerStyleSheet } from "styled-components";
+import { ServerStyleSheet } from "styled-components";
 
 export default function StyledComponentsRegistry({
   children,
@@ -17,7 +17,14 @@ export default function StyledComponentsRegistry({
     return <>{styles}</>;
   });
 
-  if (typeof window !== "undefined") return <>{children}</>;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  return styledComponentsStyleSheet.collect(<>{children}</>);
+  if (!mounted) {
+    return (
+      <>{styledComponentsStyleSheet.collectStyles(children)}</>
+    );
+  }
+
+  return <>{children}</>;
 }
