@@ -5,6 +5,7 @@ import ClientFooter from "@/components/ClientFooter";
 import CookieBanner from "@/components/CookieBanner";
 import { SteamProvider } from "@/context/SteamContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
+import { anton, orbitron, rajdhani } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Atlas RP - Loja Oficial",
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="h-full antialiased">
+    <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${orbitron.variable} ${rajdhani.variable}`}>
       <body className="min-h-full flex flex-col">
         <StyledComponentsRegistry>
           <SteamProvider>
