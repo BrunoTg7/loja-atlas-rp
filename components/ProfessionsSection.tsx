@@ -48,20 +48,12 @@ const HalfImage = styled(motion.div)<{ $side: "left" | "right" }>`
     background-image: url('/Imagens/mecanica.webp');
     transform-origin: left center;
     clip-path: polygon(0 0, 40vw 0, 60vw 100vh, 0 100vh);
-
-    @media (max-width: 768px) {
-      clip-path: polygon(0 0, 35vw 0, 55vw 100vh, 0 100vh);
-    }
   `
       : `
     left: 0;
     background-image: url('/Imagens/hospital.webp');
     transform-origin: right center;
     clip-path: polygon(40vw 0, 100vw 0, 100vw 100vh, 60vw 100vh);
-
-    @media (max-width: 768px) {
-      clip-path: polygon(35vw 0, 100vw 0, 100vw 100vh, 55vw 100vh);
-    }
   `}
 `;
 
@@ -795,8 +787,8 @@ export default function ProfessionsSection() {
 
   const impactOpacity = useTransform(
     smoothProgress,
-    [0.23, 0.27, 0.29, 0.31, 0.33, 0.37],
-    [0, 1, 0.3, 1, 0.5, 0]
+    [0.23, 0.28, 0.33, 0.37],
+    [0, 1, 1, 0]
   );
   const impactScale = useTransform(smoothProgress, [0.23, 0.33], [0.5, 2]);
 
@@ -835,10 +827,6 @@ export default function ProfessionsSection() {
           style={{
             opacity: impactOpacity,
             scale: impactScale,
-            background:
-              "linear-gradient(to bottom, transparent 5%, rgba(249,115,22,0.8) 25%, rgba(255,255,255,0.95) 50%, rgba(34,197,94,0.8) 75%, transparent 95%)",
-            boxShadow:
-              "0 0 40px rgba(255,255,255,0.5), 0 0 80px rgba(249,115,22,0.3), 0 0 80px rgba(34,197,94,0.3)",
           }}
         />
 

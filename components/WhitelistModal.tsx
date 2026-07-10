@@ -100,8 +100,8 @@ function validate(form: FormState): Record<string, string> {
     e.rpExperience = "Conte um pouco da sua experiência.";
   if (!form.characterStory.trim()) {
     e.characterStory = "Escreva uma história para seu personagem.";
-  } else if (form.characterStory.trim().length < 30) {
-    e.characterStory = "A história precisa ter pelo menos 30 caracteres.";
+  } else if (form.characterStory.trim().length < 300) {
+    e.characterStory = "A história precisa ter pelo menos 300 caracteres.";
   }
   return e;
 }

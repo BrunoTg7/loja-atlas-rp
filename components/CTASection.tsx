@@ -117,10 +117,10 @@ export default function CTASection() {
         <div className="max-w-7xl mx-auto">
           {/* Welcome text */}
           <div className="text-center mb-8">
-            <p className="font-anton text-xs font-bold text-[#d4af37] uppercase tracking-[0.3em] mb-3">
+            <p className="text-xs font-bold text-[#d4af37] uppercase tracking-[0.3em] mb-3">
               Comece sua jornada
             </p>
-            <h2 className="font-anton text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className=" text-3xl md:text-4xl font-bold text-white mb-4">
               Sua história em <span className="text-[#d4af37]">Atlas RP</span> começa aqui
             </h2>
             <p className="font-rajdhani text-lg text-white/60 max-w-2xl mx-auto">
@@ -134,7 +134,7 @@ export default function CTASection() {
             <div className="flex-1 order-2 lg:order-1">
               {/* Whitelist explanation */}
               <div className="mb-8">
-                <h3 className="font-anton text-lg font-bold text-white mb-3">
+                <h3 className=" text-lg font-bold text-white mb-3">
                   O que é a <span className="text-[#d4af37]">Whitelist</span>?
                 </h3>
                 <p className="font-rajdhani text-white/50 leading-relaxed">
@@ -144,7 +144,7 @@ export default function CTASection() {
 
               {/* Steps */}
               <div className="mb-8">
-                <h4 className="font-anton text-sm font-bold text-white/70 uppercase tracking-wider mb-4">
+                <h4 className=" text-sm font-bold text-white/70 uppercase tracking-wider mb-4">
                   Etapas
                 </h4>
                 <div className="space-y-1">
@@ -204,7 +204,7 @@ export default function CTASection() {
               {ticketState === "analyzing" && (
                 <FadeIn $visible={true}>
                   <div className="bg-[#d4af37]/10 border border-[#d4af37]/20 rounded-xl p-5">
-                    <p className="font-anton text-sm font-bold text-[#d4af37] mb-1">
+                    <p className=" text-sm font-bold text-[#d4af37] mb-1">
                       Em análise...
                     </p>
                     <p className="font-rajdhani text-sm text-white/50">
@@ -249,7 +249,7 @@ export default function CTASection() {
       {fiveMOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-[#0d0b09] border border-[#d4af37]/20 rounded-2xl p-8 max-w-md mx-4 text-center">
-            <h3 className="font-anton text-xl font-bold text-white mb-4">
+            <h3 className=" text-xl font-bold text-white mb-4">
               Conectar ao Servidor
             </h3>
             <p className="font-rajdhani text-white/60 mb-2">
@@ -261,7 +261,7 @@ export default function CTASection() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleConnect}
-                className="px-6 py-3 bg-gradient-to-r from-[#d4af37] to-[#b8941f] rounded-lg font-anton text-sm font-bold text-[#0d0b09] uppercase tracking-wider cursor-pointer transition-all hover:shadow-[0_6px_30px_rgba(212,175,55,0.45)]"
+                className="px-6 py-3 bg-gradient-to-r from-[#d4af37] to-[#b8941f] rounded-lg  text-sm font-bold text-[#0d0b09] uppercase tracking-wider cursor-pointer transition-all hover:shadow-[0_6px_30px_rgba(212,175,55,0.45)]"
               >
                 Tentar Conectar Novamente
               </button>
