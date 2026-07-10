@@ -23,9 +23,9 @@ export default function CookieBanner() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto bg-[#0B1725]/95 backdrop-blur-md border border-[#d4af37]/20 rounded-2xl p-6 shadow-2xl shadow-black/50">
+      <div className="max-w-4xl mx-auto bg-[#0B1725]/95 backdrop-blur-md border border-[#d4af37]/20 rounded-2xl p-4 md:p-6 shadow-2xl shadow-black/50">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div className="shrink-0 w-12 h-12 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
+          <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
             <svg
               className="w-6 h-6 text-[#d4af37]"
               fill="none"

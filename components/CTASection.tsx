@@ -68,6 +68,12 @@ const CTAButton = styled.span`
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(212,175,55,0.3);
 
+  @media (max-width: 480px) {
+    padding: 10px 20px;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+  }
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 30px rgba(212,175,55,0.45);
@@ -107,10 +113,10 @@ export default function CTASection() {
 
   return (
     <>
-      <section className="py-20 px-4 relative overflow-hidden bg-[#05080F]">
+      <section className="py-12 md:py-20 px-4 relative overflow-hidden bg-[#05080F]">
         <div className="max-w-7xl mx-auto">
           {/* Welcome text */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <p className="font-anton text-xs font-bold text-[#d4af37] uppercase tracking-[0.3em] mb-3">
               Comece sua jornada
             </p>
@@ -123,7 +129,7 @@ export default function CTASection() {
           </div>
 
           {/* Main content - 2 columns */}
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+          <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
             {/* Left - Text / Whitelist */}
             <div className="flex-1 order-2 lg:order-1">
               {/* Whitelist explanation */}
@@ -175,7 +181,7 @@ export default function CTASection() {
 
               {/* CTA Button */}
               {ticketState === "locked" && (
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className=" grid grid-cols-2 gap-6">
                   <button
                     onClick={() => setWhitelistOpen(true)}
                     className="cursor-pointer"

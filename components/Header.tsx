@@ -1,8 +1,44 @@
 "use client";
 
+import { useCart } from "@/context/CartContext";
 import { useSteam } from "@/context/SteamContext";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CartDrawer from "./CartDrawer";
+
+function MobileMenu({ open, onClose, user, isAdmin }: { open: boolean; onClose: () => void; user: { personaName: string; avatar?: string } | null; isAdmin: boolean }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-40 md:hidden -mt-1">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute top-[60px] left-0 right-0 bg-[#0a0a0f]/98 border-b border-[#FF2E44]/20 p-6 shadow-xl">
+        <nav className="flex flex-col gap-4">
+          <Link href="/" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Início</Link>
+          <Link href="/atlas-coins" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas Coins</Link>
+          {isAdmin && (
+            <Link href="/admin/whitelist" onClick={onClose} className="font-rajdhani text-base text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">Admin</Link>
+          )}
+        </nav>
+        <div className="mt-4 pt-4 border-t border-white/10">
+          {user ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {user.avatar && <img src={user.avatar} alt={user.personaName} className="h-6 w-6 rounded-full" />}
+                <span className="font-rajdhani text-sm text-white font-medium">{user.personaName}</span>
+              </div>
+              <a href="/api/auth/logout" className="font-rajdhani text-xs text-red-400 hover:text-red-300 uppercase tracking-wider">Sair</a>
+            </div>
+          ) : (
+            <a href="/api/auth/steam" className="flex items-center justify-center gap-2 px-4 py-3 bg-[#FF2E44]/90 hover:bg-[#FF2E44] text-white font-rajdhani font-semibold text-sm uppercase tracking-wider rounded-xl transition-all">
+              <svg className="h-4 w-4" viewBox="0 0 30 30" fill="none"><path d="M2.57 20.03C4.3 25.8 9.65 30 15.99 30c7.74 0 14-6.27 14-14s-6.27-14-14-14c-7.42 0-13.5 5.77-13.98 13.07 0 2.1 0 2.97.56 4.96z" fill="#111D2E"/><path d="M15.27 12.56l-3.43 4.98c-.81-.04-1.62.19-2.3.63l-7.53-3.1c0 0-.17 2.86.55 5l5.32 2.19c.27 1.2 1.09 2.24 2.3 2.75 1.98.82 4.26-.12 5.08-2.1.22-.52.32-1.06.3-1.6l5.03-3.5c2.94 0 5.32-2.39 5.32-5.33s-2.39-5.33-5.32-5.33c-2.84 0-5.48 2.47-5.32 5.39z" fill="white"/></svg>
+              Entrar com Steam
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SteamIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,7 +56,10 @@ const SteamIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 
 export default function Header() {
   const { user, loading } = useSteam();
+  const { itemCount } = useCart();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -35,20 +74,21 @@ export default function Header() {
   }, [user]);
 
   return (
+    <>
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-[#FF2E44]/20">
-      <div className="max-w-7xl mx-auto py-2 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto py-2 px-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="relative h-16 w-auto">
+          <div className="relative h-10 md:h-16 w-auto">
             <img
               src="/Imagens/logo-atlas-rp.webp"
               alt="Atlas RP Logo"
-              className="h-full w-40 object-contain"
+              className="h-full w-auto max-w-[120px] md:w-40 object-contain"
             />
           </div>
         </Link>
 
-        {/* Navigation */}
+        {/* Navigation - Desktop */}
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">
           <Link
             href="/"
@@ -73,13 +113,45 @@ export default function Header() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Cart button */}
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative p-2 md:p-2.5 text-gray-400 hover:text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/10 rounded-xl transition-all duration-300"
+            title="Carrinho"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#d4af37] text-[#0a0a0a] text-[10px] font-black flex items-center justify-center">
+                {itemCount}
+              </span>
+            )}
+          </button>
+
+          {/* Hamburger - Mobile */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all"
+            title="Menu"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Desktop Login/User */}
           {loading ? (
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white/5 text-gray-500 font-rajdhani text-sm rounded-xl">
+            <div className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-white/5 text-gray-500 font-rajdhani text-sm rounded-xl">
               <span className="h-4 w-4 rounded-full border-2 border-gray-500/40 border-t-gray-400 animate-spin" />
             </div>
           ) : user ? (
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl">
                 {user.avatar && (
                   <img
@@ -105,7 +177,7 @@ export default function Header() {
           ) : (
             <a
               href="/api/auth/steam"
-              className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-[#FF2E44]/90 hover:bg-[#FF2E44] text-white font-rajdhani font-semibold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#FF2E44]/20"
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-[#FF2E44]/90 hover:bg-[#FF2E44] text-white font-rajdhani font-semibold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#FF2E44]/20"
             >
               <SteamIcon />
               Entrar com Steam
@@ -114,5 +186,8 @@ export default function Header() {
         </div>
       </div>
     </header>
+    <MobileMenu open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} user={user} isAdmin={isAdmin} />
+    <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+    </>
   );
 }

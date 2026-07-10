@@ -25,7 +25,7 @@ const initialForm: FormState = {
   characterStory: "",
 };
 
-type Step = "login" | "validate" | "form";
+type Step = "login" | "form";
 type Status = "idle" | "loading" | "success" | "error";
 
 const STORAGE_KEY = "atlas_whitelist_draft";
@@ -75,7 +75,7 @@ function loadDraft(): { form: FormState; step: Step } | null {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
-    return { form, step: step || "validate" };
+    return { form, step: step || "form" };
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return null;
@@ -88,6 +88,7 @@ function clearDraft() {
 
 function validate(form: FormState): Record<string, string> {
   const e: Record<string, string> = {};
+  if (!form.cityId.trim()) e.cityId = "Informe o ID da cidade.";
   if (!form.characterName.trim())
     e.characterName = "Informe o nome do personagem.";
   if (!form.age.trim()) {
@@ -115,10 +116,7 @@ export default function WhitelistModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [validatingId, setValidatingId] = useState(false);
-  const [idValidated, setIdValidated] = useState(false);
   const firstFieldRef = useRef<HTMLInputElement | null>(null);
-  const cityIdRef = useRef<HTMLInputElement | null>(null);
   const storyRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -132,24 +130,20 @@ export default function WhitelistModal({
         const draft = loadDraft();
         if (draft && draft.form.cityId && draft.step === "form") {
           setForm(draft.form);
-          setStep("form");
         } else {
           setForm(draft?.form || initialForm);
-          setStep("validate");
         }
+        setStep("form");
       }
       setErrors({});
       setStatus("idle");
       setErrorMessage("");
-      setValidatingId(false);
-      setIdValidated(false);
     }
   }, [open, user, steamLoading]);
 
   useEffect(() => {
-    if (!open) return;
-    const target = step === "validate" ? cityIdRef : firstFieldRef;
-    setTimeout(() => target.current?.focus(), 50);
+    if (!open || step !== "form") return;
+    setTimeout(() => firstFieldRef.current?.focus(), 50);
   }, [step, open]);
 
   useEffect(() => {
@@ -167,45 +161,6 @@ export default function WhitelistModal({
       return next;
     });
     setErrors((prev) => ({ ...prev, [field]: "" }));
-  }
-
-  async function handleValidateId() {
-    if (!form.cityId.trim()) {
-      setErrors({ cityId: "Informe o ID da cidade." });
-      return;
-    }
-
-    setValidatingId(true);
-    setErrors({});
-    setErrorMessage("");
-
-    try {
-      const res = await fetch("/api/whitelist/validate-id", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cityId: form.cityId.trim() }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setErrors({ cityId: data.error || "ID inválido." });
-        setValidatingId(false);
-        return;
-      }
-
-      setValidatingId(false);
-      setIdValidated(true);
-      setTimeout(() => {
-        setStep("form");
-        saveDraft(form, "form");
-      }, 1500);
-    } catch {
-      setErrorMessage("Erro ao validar ID. Verifique sua conexão.");
-      setErrors({ cityId: "Erro ao validar." });
-    } finally {
-      setValidatingId(false);
-    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -271,7 +226,7 @@ export default function WhitelistModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="whitelist-title"
-            className="w-full max-w-md bg-[#18181c] border border-white/10 rounded-2xl p-6 shadow-2xl"
+            className="w-full max-w-md bg-[#18181c] border border-white/10 rounded-2xl p-5 md:p-6 shadow-2xl"
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -382,141 +337,7 @@ export default function WhitelistModal({
                 </div>
               </div>
 
-            /* ===== STEP 2: VALIDATE ID ===== */
-            ) : step === "validate" ? (
-              <div>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl" aria-hidden="true">
-                      🎓
-                    </span>
-                    <h2
-                      id="whitelist-title"
-                      className="text-lg font-semibold text-white"
-                    >
-                      Whitelist Atlas RP
-                    </h2>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    aria-label="Fechar formulário"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path
-                        d="M18 6L6 18M6 6l12 12"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                {idValidated ? (
-                  <div className="py-8 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/15">
-                      <svg
-                        width="28"
-                        height="28"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#34d399"
-                        strokeWidth="2.5"
-                      >
-                        <path
-                          d="M20 6L9 17l-5-5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-base font-semibold text-white mb-1">
-                      ID Validado com Sucesso!
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      Redirecionando para o formulário...
-                    </p>
-                    <div className="mt-4 flex justify-center">
-                      <span className="h-4 w-4 rounded-full border-2 border-emerald-400/40 border-t-emerald-400 animate-spin" />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="mb-5 flex gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
-                      <span className="text-amber-400 mt-0.5" aria-hidden="true">
-                        ⚠
-                      </span>
-                      <p className="text-xs text-amber-200/90 leading-relaxed">
-                        Digite o ID que apareceu no jogo. Ele está vinculado à sua
-                        conta Steam.
-                      </p>
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-white mb-1.5">
-                        Qual é o seu ID na cidade?{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        ref={cityIdRef}
-                        type="text"
-                        value={form.cityId}
-                        onChange={(e) => updateField("cityId", e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleValidateId();
-                        }}
-                        placeholder="Digite seu ID da cidade"
-                        className={`w-full rounded-lg border bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none ${
-                          errors.cityId
-                            ? "border-red-500/60 focus:border-red-400"
-                            : "border-white/10 focus:border-indigo-400"
-                        }`}
-                      />
-                      {errors.cityId && (
-                        <p className="mt-1 text-xs text-red-400">
-                          {errors.cityId}
-                        </p>
-                      )}
-                    </div>
-
-                    {errorMessage && (
-                      <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
-                        <p className="text-sm text-red-400">{errorMessage}</p>
-                      </div>
-                    )}
-
-                    <div className="flex justify-end gap-3">
-                      <button
-                        type="button"
-                        onClick={onClose}
-                        className="rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium px-5 py-2.5"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleValidateId}
-                        disabled={validatingId || !form.cityId.trim()}
-                        className="rounded-lg bg-indigo-500 hover:bg-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white text-sm font-medium px-5 py-2.5 flex items-center gap-2"
-                      >
-                        {validatingId && (
-                          <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                        )}
-                        {validatingId ? "Validando..." : "Validar ID"}
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-            /* ===== STEP 3: FULL FORM ===== */
+            /* ===== STEP 2: FORM ===== */
             ) : (
               <form onSubmit={handleSubmit} noValidate>
                 <div className="flex items-start justify-between mb-4">
@@ -553,30 +374,16 @@ export default function WhitelistModal({
                   </button>
                 </div>
 
-                <div className="mb-5 flex gap-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#34d399"
-                    strokeWidth="2"
-                    className="mt-0.5 shrink-0"
-                  >
-                    <path
-                      d="M20 6L9 17l-5-5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="text-xs text-emerald-200/90 leading-relaxed">
-                    ID <strong>{form.cityId}</strong> validado com sucesso.
-                  </p>
-                </div>
-
-                <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide">
+                <div className="space-y-4 max-h-[60vh] sm:max-h-[50vh] overflow-y-auto pr-1 scrollbar-hide">
                   <Field
                     inputRef={firstFieldRef}
+                    label="Qual é o seu ID na cidade?"
+                    placeholder="Digite seu ID da cidade"
+                    value={form.cityId}
+                    onChange={(v) => updateField("cityId", v)}
+                    error={errors.cityId}
+                  />
+                  <Field
                     label="Qual é o nome do seu personagem?"
                     placeholder="Exemplo: João Silva"
                     value={form.characterName}

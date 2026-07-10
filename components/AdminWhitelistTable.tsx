@@ -34,21 +34,21 @@ export default function AdminWhitelistTable({
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const handleAction = useCallback(
-    async (messageId: string, action: "approve" | "reject", cityId: string, steamName: string, motivo?: string) => {
+    async (messageId: string, action: "approve" | "reject", cityId: string, steamId: string, steamName: string, characterName: string, motivo?: string) => {
       setActions((prev) => ({ ...prev, [messageId]: { status: "loading" } }));
 
       try {
-        const res = await fetch("/api/admin/discord-action", {
+        const discordRes = await fetch("/api/admin/discord-action", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messageId, action, cityId, steamName, motivo }),
+          body: JSON.stringify({ messageId, action, cityId, steamId, steamName, characterName, motivo }),
         });
 
-        if (!res.ok) {
-          const data = await res.json();
+        if (!discordRes.ok) {
+          const discordData = await discordRes.json();
           setActions((prev) => ({
             ...prev,
-            [messageId]: { status: "error", error: data.error || "Erro ao processar" },
+            [messageId]: { status: "error", error: discordData.error || "Erro ao processar no Discord" },
           }));
           return;
         }
@@ -145,7 +145,7 @@ export default function AdminWhitelistTable({
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleAction(req.messageId, "approve", req.cityId, req.steamName)}
+                            onClick={() => handleAction(req.messageId, "approve", req.cityId, req.steamId, req.steamName, req.characterName)}
                             disabled={isProcessing}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors disabled:opacity-50"
                           >
@@ -239,7 +239,7 @@ export default function AdminWhitelistTable({
                 onClick={() => {
                   const req = requests.find((r) => r.messageId === rejectModal);
                   if (req) {
-                    handleAction(rejectModal, "reject", req.cityId, req.steamName, rejectMotivo.trim() || undefined);
+                    handleAction(rejectModal, "reject", req.cityId, req.steamId, req.steamName, req.characterName, rejectMotivo.trim() || undefined);
                     setRejectModal(null);
                     setRejectMotivo("");
                   }

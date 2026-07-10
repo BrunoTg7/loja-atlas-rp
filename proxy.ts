@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const SESSION_COOKIE = "atlas_session";
 const SECRET = process.env.SESSION_SECRET || "atlas-rp-fallback-secret-change-me";
@@ -54,7 +55,7 @@ async function verifyJwt(
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin")) {

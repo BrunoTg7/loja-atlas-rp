@@ -105,9 +105,7 @@ export default function HeroSection() {
             y: textY,
           }}
         >
-          {/* Decorative lines */}
-          <div className="absolute top-[15%] left-0 w-full h-px bg-gradient-to-r from-transparent via-[#FF2E44]/20 to-transparent" />
-          <div className="absolute bottom-[15%] left-0 w-full h-px bg-gradient-to-r from-transparent via-[#FF2E44]/20 to-transparent" />
+          
 
           {/* Main Content - Logo left, Text right */}
           <div className="w-full max-w-7xl mx-auto px-6 md:px-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 pointer-events-auto">
@@ -116,17 +114,17 @@ export default function HeroSection() {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="shrink-0 mt-12 md:mt-18 lg:mt-24 xl:mt-32 -ml-4 md:-ml-8 lg:-ml-12"
+              className="shrink-0 mt-8 md:mt-18 lg:mt-24 xl:mt-32 -ml-2 md:-ml-8 lg:-ml-12"
             >
               <img
                 src="/Imagens/logo-atlas-rp.webp"
                 alt="Atlas RP"
-                className="h-56 md:h-64 lg:h-72 xl:h-[28rem] object-contain drop-shadow-[0_0_80px_rgba(255,46,68,0.5)]"
+                className="h-32 sm:h-56 md:h-64 lg:h-72 xl:h-[28rem] object-contain drop-shadow-[0_0_80px_rgba(255,0,0,0.8)]"
               />
             </motion.div>
 
             {/* Text - Right side */}
-            <div className="flex flex-col text-center mt-4 ml-24 md:mt-50">
+            <div className="flex flex-col text-center mt-2 md:mt-4 ml-0 md:ml-24">
               {/* Welcome text */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
@@ -138,14 +136,15 @@ export default function HeroSection() {
                   <span className="text-[#FF2E44]">SEJA BEM-VINDO AO ATLAS RP!</span>
                 </p>
                 <p className="font-rajdhani text-base md:text-lg lg:text-xl text-white/80 mt-2 leading-relaxed">
-                  Uma cidade feita para você viver experiências únicas,<br />
+                  Uma cidade feita para você viver experiências únicas,{' '}
+                  <span className="hidden sm:inline"><br /></span>
                   criar sua história e fazer parte de algo maior!
                 </p>
               </motion.div>
 
               {/* Rules text */}
               <motion.p
-                className="font-rajdhani text-sm md:text-base text-white/60 mb-4 italic"
+                className="font-rajdhani text-sm md:text-base text-white/80 mb-4 italic"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}

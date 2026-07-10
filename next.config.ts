@@ -21,6 +21,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: ".",
+  },
   headers: async () =>
     securityHeaders.map((h) => ({
       source: "/(.*)",

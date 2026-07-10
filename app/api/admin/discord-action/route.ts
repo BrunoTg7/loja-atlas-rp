@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { isStaffMember } from "@/lib/whitelistApi";
-import { addReaction, replyToMessage } from "@/lib/discord";
+import {
+  addReaction,
+  replyToMessage,
+  sendToLiberacao,
+  saveToRegistry,
+} from "@/lib/discord";
 
 interface ActionPayload {
   messageId: string;
   action: "approve" | "reject";
   motivo?: string;
   cityId: string;
+  steamId: string;
   steamName: string;
+  characterName: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -47,17 +54,42 @@ export async function POST(req: NextRequest) {
 
   try {
     if (body.action === "approve") {
-      await addReaction(body.messageId, "✅");
+      await addReaction(body.messageId, "✅").catch((err) =>
+        console.error("Erro ao adicionar reação (não bloqueante):", err)
+      );
       await replyToMessage(
         body.messageId,
         `✅ **Whitelist APROVADA** por <@${session.steamId}>\n>ID #${body.cityId} — ${body.steamName}`
+      ).catch((err) =>
+        console.error("Erro ao responder mensagem (não bloqueante):", err)
+      );
+
+      await sendToLiberacao(body.cityId).catch((err) =>
+        console.error("Erro ao enviar para liberacao (não bloqueante):", err)
+      );
+      await saveToRegistry(
+        body.cityId,
+        body.steamId,
+        body.steamName,
+        body.characterName,
+        session.personaName
+      ).catch((err) =>
+        console.error("Erro ao salvar no registro (não bloqueante):", err)
       );
     } else {
-      await addReaction(body.messageId, "❌");
+      await addReaction(body.messageId, "❌").catch((err) =>
+        console.error("Erro ao adicionar reação (não bloqueante):", err)
+      );
       const motivoText = body.motivo ? `\n>Motivo: ${body.motivo}` : "";
       await replyToMessage(
         body.messageId,
         `❌ **Whitelist REPROVADA** por <@${session.steamId}>\n>ID #${body.cityId} — ${body.steamName}${motivoText}`
+      ).catch((err) =>
+        console.error("Erro ao responder mensagem (não bloqueante):", err)
+      );
+
+      await sendToLiberacao(body.cityId).catch((err) =>
+        console.error("Erro ao enviar para liberacao (não bloqueante):", err)
       );
     }
 

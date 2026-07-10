@@ -6,7 +6,8 @@ interface CartItem {
   id: string;
   name: string;
   price: number;
-  type: "vip" | "car";
+  amount: number;
+  type: "vip" | "car" | "coin";
   image?: string;
 }
 

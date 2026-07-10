@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import ClientFooter from "@/components/ClientFooter";
 import CookieBanner from "@/components/CookieBanner";
 import { SteamProvider } from "@/context/SteamContext";
+import { CartProvider } from "@/context/CartContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import { anton, orbitron, rajdhani } from "./fonts";
 
@@ -46,12 +47,14 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <StyledComponentsRegistry>
           <SteamProvider>
-            <Header />
-            <main className="flex-1 pt-16">
-              {children}
-            </main>
-            <ClientFooter />
-            <CookieBanner />
+            <CartProvider>
+              <Header />
+              <main className="flex-1 pt-16">
+                {children}
+              </main>
+              <ClientFooter />
+              <CookieBanner />
+            </CartProvider>
           </SteamProvider>
         </StyledComponentsRegistry>
       </body>

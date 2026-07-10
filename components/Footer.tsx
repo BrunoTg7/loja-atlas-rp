@@ -131,10 +131,10 @@ export default function Footer() {
       {/* Terms Modal */}
       {showTerms && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B1725] border border-[#d4af37]/20 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
+            <div className="bg-[#0B1725] border border-[#d4af37]/20 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-4 md:p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="font-orbitron text-lg font-bold text-[#d4af37]">TERMOS DE USO</h2>
+                <h2 className="font-orbitron text-sm md:text-lg font-bold text-[#d4af37]">TERMOS DE USO</h2>
                 <button onClick={() => setShowTerms(false)} className="text-white/40 hover:text-[#d4af37] transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -158,10 +158,10 @@ export default function Footer() {
       {/* Privacy Modal */}
       {showPrivacy && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B1725] border border-[#d4af37]/20 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
+            <div className="bg-[#0B1725] border border-[#d4af37]/20 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-4 md:p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="font-orbitron text-lg font-bold text-[#d4af37]">POLÍTICA DE PRIVACIDADE</h2>
+                <h2 className="font-orbitron text-sm md:text-lg font-bold text-[#d4af37]">POLÍTICA DE PRIVACIDADE</h2>
                 <button onClick={() => setShowPrivacy(false)} className="text-white/40 hover:text-[#d4af37] transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

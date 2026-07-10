@@ -25,15 +25,11 @@ const lockBounce = keyframes`
 
 const TicketWrapper = styled.div<{ $unlocked: boolean }>`
   position: relative;
-  width: 320px;
-  height: 420px;
+  width: min(320px, 85vw);
+  height: auto;
+  aspect-ratio: 320 / 420;
   filter: ${p => p.$unlocked ? "none" : "saturate(0.3) brightness(0.7)"};
   transition: filter 0.8s ease;
-
-  @media (max-width: 768px) {
-    width: 280px;
-    height: 380px;
-  }
 `;
 
 const TicketSVG = styled.svg`
@@ -63,7 +59,7 @@ const HoloOverlay = styled.div<{ $unlocked: boolean }>`
 
 const IDSlot = styled.div`
   position: absolute;
-  bottom: 52px;
+  bottom: 12.5%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -97,8 +93,8 @@ const SlotDigit = styled.span<{ $rolling: boolean }>`
 
 const LockIcon = styled.div<{ $unlocked: boolean }>`
   position: absolute;
-  bottom: 18px;
-  right: 32px;
+  bottom: 4.3%;
+  right: 10%;
   font-size: 16px;
   transition: all 0.5s ease;
   animation: ${({ $unlocked }) => $unlocked ? "none" : `lockBounce 2s ease infinite`};

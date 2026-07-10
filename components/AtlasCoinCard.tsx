@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import styled from 'styled-components';
+import { useCart } from "@/context/CartContext";
 
 interface CoinPackage {
   id: string;
@@ -210,9 +211,16 @@ function Coin3D({ size = 96, className = "" }: { size?: number; className?: stri
 /* ─── FEATURED CARD ─── */
 function FeaturedCard({ pkg, index }: { pkg: CoinPackage; index: number }) {
   const shouldReduceMotion = useReducedMotion();
+  const { addToCart } = useCart();
 
   const handleAdd = () => {
-    alert(`Pacote de ${pkg.amount.toLocaleString("pt-BR")} Atlas Coins - R$ ${pkg.price.toFixed(2)}`);
+    addToCart({
+      id: pkg.id,
+      name: `${pkg.amount.toLocaleString("pt-BR")} Atlas Coins`,
+      price: pkg.price,
+      amount: pkg.amount,
+      type: "coin",
+    });
   };
 
   const isBestValue = pkg.tier === "bestValue";
@@ -308,9 +316,16 @@ function FeaturedCard({ pkg, index }: { pkg: CoinPackage; index: number }) {
 /* ─── SECONDARY CARD ─── */
 function SecondaryCard({ pkg, index }: { pkg: CoinPackage; index: number }) {
   const shouldReduceMotion = useReducedMotion();
+  const { addToCart } = useCart();
 
   const handleAdd = () => {
-    alert(`Pacote de ${pkg.amount.toLocaleString("pt-BR")} Atlas Coins - R$ ${pkg.price.toFixed(2)}`);
+    addToCart({
+      id: pkg.id,
+      name: `${pkg.amount.toLocaleString("pt-BR")} Atlas Coins`,
+      price: pkg.price,
+      amount: pkg.amount,
+      type: "coin",
+    });
   };
 
   return (

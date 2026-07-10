@@ -1,18 +1,22 @@
 "use client";
 
-import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
-  useTransform,
   useSpring,
+  useTransform,
 } from "framer-motion";
+import { useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 const Section = styled.section`
   position: relative;
   height: 400vh;
   background: #000;
+
+  @media (max-width: 768px) {
+    height: 500vh;
+  }
 `;
 
 const StickyContainer = styled.div`
@@ -40,10 +44,20 @@ const HalfImage = styled(motion.div)<{ $side: "left" | "right" }>`
       ? `
     left: 0;
     background-image: url('/Imagens/policia.webp');
+
+    @media (max-width: 768px) {
+      width: 100%;
+      clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+    }
   `
       : `
     right: 0;
     background-image: url('/Imagens/bandido.webp');
+
+    @media (max-width: 768px) {
+      width: 100%;
+      clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+    }
   `}
 `;
 
@@ -75,6 +89,20 @@ const ContentLayer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+
+  @media (max-width: 768px) {
+    height: auto;
+    min-height: 100vh;
+    justify-content: center;
+    padding: 4rem 1rem 2rem;
+    gap: 0.4rem;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 `;
 
 const Eyebrow = styled(motion.p)`
@@ -86,6 +114,12 @@ const Eyebrow = styled(motion.p)`
   text-transform: uppercase;
   margin-bottom: 0.5rem;
   text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+
+  @media (max-width: 768px) {
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    margin-bottom: 0.15rem;
+  }
 `;
 
 const MainTitle = styled(motion.h2)`
@@ -100,16 +134,27 @@ const MainTitle = styled(motion.h2)`
   max-width: 600px;
   line-height: 1.2;
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: clamp(0.85rem, 5vw, 1.3rem);
+    margin-bottom: 0.15rem;
+  }
 `;
 
 const Subtitle = styled(motion.p)`
   font-family: "Rajdhani", sans-serif;
-  font-size: clamp(0.8rem, 1.3vw, 0.95rem);
-  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  color: rgba(247, 247, 247, 1);
   text-align: center;
   max-width: 500px;
   line-height: 1.5;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.72rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
 `;
 
 const CardsRow = styled(motion.div)`
@@ -120,6 +165,16 @@ const CardsRow = styled(motion.div)`
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.5rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 0.25rem;
+  }
 `;
 
 const stampSlam = keyframes`
@@ -131,15 +186,15 @@ const stampSlam = keyframes`
 
 const DocumentCard = styled(motion.div)<{ $faction: "police" | "criminal" | "wanted" }>`
   flex: 1;
-  min-width: 260px;
+  min-width: min(260px, 100%);
   max-width: 340px;
   position: relative;
   background: ${({ $faction }) =>
     $faction === "police"
-      ? "linear-gradient(170deg, rgba(20,30,60,0.92), rgba(10,15,30,0.95))"
+      ? "linear-gradient(170deg, rgba(20,30,60,0.95), rgba(10,15,30,0.98))"
       : $faction === "criminal"
-        ? "linear-gradient(170deg, rgba(40,15,15,0.92), rgba(20,8,8,0.95))"
-        : "linear-gradient(170deg, rgba(30,25,15,0.92), rgba(15,12,8,0.95))"};
+        ? "linear-gradient(170deg, rgba(40,15,15,0.95), rgba(20,8,8,0.98))"
+        : "linear-gradient(170deg, rgba(30,25,15,0.95), rgba(15,12,8,0.98))"};
   border: 1.5px solid ${({ $faction }) =>
     $faction === "police"
       ? "rgba(59,130,246,0.3)"
@@ -163,13 +218,27 @@ const DocumentCard = styled(motion.div)<{ $faction: "police" | "criminal" | "wan
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
 
   &:hover .stamp {
     animation: ${stampSlam} 0.4s ease forwards;
+  }
+
+  @media (max-width: 768px) {
+    flex: unset;
+    min-width: 0;
+    max-width: none;
+    clip-path: none;
+    border-radius: 8px;
+
+    ${({ $faction }) =>
+      $faction === "wanted" &&
+      `
+      grid-column: 1 / -1;
+    `}
   }
 `;
 
@@ -179,11 +248,15 @@ const StampBanner = styled.div<{ $faction: "police" | "criminal" | "wanted" }>`
   padding: 10px 16px;
   background: ${({ $faction }) =>
     $faction === "police"
-      ? "linear-gradient(90deg, rgba(37,99,235,0.9), rgba(59,130,246,0.7))"
+      ? "linear-gradient(90deg, rgba(37,99,235,0.95), rgba(59,130,246,0.8))"
       : $faction === "criminal"
-        ? "linear-gradient(90deg, rgba(220,38,38,0.9), rgba(239,68,68,0.7))"
-        : "linear-gradient(90deg, rgba(234,88,12,0.9), rgba(249,115,22,0.7))"};
+        ? "linear-gradient(90deg, rgba(220,38,38,0.95), rgba(239,68,68,0.8))"
+        : "linear-gradient(90deg, rgba(234,88,12,0.95), rgba(249,115,22,0.8))"};
   border-bottom: 1px solid rgba(255,255,255,0.1);
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+  }
 `;
 
 const StampText = styled.span<{ $faction: "police" | "criminal" | "wanted" }>`
@@ -199,6 +272,12 @@ const StampText = styled.span<{ $faction: "police" | "criminal" | "wanted" }>`
   border-radius: 4px;
   transform: rotate(-6deg);
   opacity: 0.9;
+
+  @media (max-width: 768px) {
+    font-size: 0.45rem;
+    padding: 3px 8px;
+    letter-spacing: 0.12em;
+  }
 
   ${({ $faction }) =>
     $faction === "criminal" &&
@@ -216,6 +295,10 @@ const DocumentBody = styled.div`
   position: relative;
   z-index: 1;
   padding: 16px 18px 12px;
+
+  @media (max-width: 768px) {
+    padding: 8px 10px 6px;
+  }
 `;
 
 const FieldRow = styled.div`
@@ -228,17 +311,28 @@ const FieldRow = styled.div`
   &:last-child {
     border-bottom: none;
   }
+
+  @media (max-width: 768px) {
+    padding: 3px 0;
+    gap: 4px;
+  }
 `;
 
 const FieldLabel = styled.span`
   font-family: "Orbitron", sans-serif;
   font-size: 0.5rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255, 255, 255, 0.73);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   min-width: 80px;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    min-width: 50px;
+    font-size: 0.35rem;
+    letter-spacing: 0.04em;
+  }
 `;
 
 const FieldValue = styled.span`
@@ -246,6 +340,10 @@ const FieldValue = styled.span`
   font-size: 0.8rem;
   font-weight: 600;
   color: rgba(255,255,255,0.75);
+
+  @media (max-width: 768px) {
+    font-size: 0.58rem;
+  }
 `;
 
 const ProgressionValue = styled.span`
@@ -257,6 +355,11 @@ const ProgressionValue = styled.span`
   flex-wrap: wrap;
   gap: 4px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    font-size: 0.5rem;
+    gap: 2px;
+  }
 `;
 
 const ProgStep = styled.span<{ $faction: "police" | "criminal" }>`
@@ -268,6 +371,11 @@ const ProgStep = styled.span<{ $faction: "police" | "criminal" }>`
   border-radius: 3px;
   font-size: 0.7rem;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 0.45rem;
+    padding: 1px 3px;
+  }
 `;
 
 const ProgArrow = styled.span`
@@ -279,30 +387,46 @@ const DocumentFooter = styled.div`
   position: relative;
   z-index: 1;
   padding: 0 18px 16px;
+
+  @media (max-width: 768px) {
+    padding: 0 10px 8px;
+  }
 `;
 
 const DottedLine = styled.div<{ $faction: "police" | "criminal" | "wanted" }>`
-  border-top: 1.5px dashed rgba(255,255,255,0.1);
-  margin-bottom: 12px;
+  border-top: 1.5px dashed rgba(255, 255, 255, 0.45);
+  margin-bottom: 18px;
+  margin-top: 18px;
   position: relative;
+
+  @media (max-width: 768px) {
+    margin-bottom: 6px;
+    margin-top: 4px;
+  }
 
   &::after {
     content: "ASSINATURA DIGITAL";
     position: absolute;
-    top: -8px;
+    top: 2px;
     left: 50%;
     transform: translateX(-50%);
     font-family: "Orbitron", sans-serif;
-    font-size: 0.4rem;
-    color: rgba(255,255,255,0.15);
+    font-size: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
     letter-spacing: 0.15em;
     background: ${({ $faction }) =>
       $faction === "police"
-        ? "rgba(20,30,60,0.92)"
+        ? "rgba(20,30,60,0.95)"
         : $faction === "criminal"
-          ? "rgba(40,15,15,0.92)"
-          : "rgba(30,25,15,0.92)"};
+          ? "rgba(40,15,15,0.95)"
+          : "rgba(30,25,15,0.95)"};
     padding: 0 8px;
+
+    @media (max-width: 768px) {
+      font-size: 0.3rem;
+      letter-spacing: 0.06em;
+      padding: 0 4px;
+    }
   }
 `;
 
@@ -320,10 +444,10 @@ const ActionButton = styled.a<{ $faction: "police" | "criminal" | "wanted" }>`
   color: #fff;
   background: ${({ $faction }) =>
     $faction === "police"
-      ? "linear-gradient(135deg, rgba(37,99,235,0.8), rgba(59,130,246,0.6))"
+      ? "linear-gradient(135deg, rgba(37,99,235,0.9), rgba(59,130,246,0.7))"
       : $faction === "criminal"
-        ? "linear-gradient(135deg, rgba(220,38,38,0.8), rgba(239,68,68,0.6))"
-        : "linear-gradient(135deg, rgba(234,88,12,0.8), rgba(249,115,22,0.6))"};
+        ? "linear-gradient(135deg, rgba(220,38,38,0.9), rgba(239,68,68,0.7))"
+        : "linear-gradient(135deg, rgba(234,88,12,0.9), rgba(249,115,22,0.7))"};
   border: 1px solid ${({ $faction }) =>
     $faction === "police"
       ? "rgba(59,130,246,0.4)"
@@ -343,6 +467,12 @@ const ActionButton = styled.a<{ $faction: "police" | "criminal" | "wanted" }>`
   cursor: pointer;
   transition: all 0.3s ease;
 
+  @media (max-width: 768px) {
+    padding: 6px 8px;
+    font-size: 0.4rem;
+    letter-spacing: 0.06em;
+  }
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: ${({ $faction }) =>
@@ -360,6 +490,11 @@ const StarsRow = styled.div`
   gap: 0.4rem;
   justify-content: center;
   margin: 12px 0;
+
+  @media (max-width: 768px) {
+    margin: 4px 0;
+    gap: 0.15rem;
+  }
 `;
 
 const StarInput = styled.input`
@@ -384,6 +519,11 @@ const StarLabel = styled.label<{ $filled: boolean }>`
     filter: ${({ $filled }) =>
       $filled ? "drop-shadow(0 0 8px rgba(249,115,22,0.5))" : "none"};
     transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
+
+    @media (max-width: 768px) {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 `;
 
@@ -408,6 +548,11 @@ const LegendBox = styled.div<{ $level: number }>`
   border-radius: 6px;
   min-height: 60px;
   transition: all 0.4s ease;
+
+  @media (max-width: 768px) {
+    padding: 5px 7px;
+    min-height: 35px;
+  }
 `;
 
 const LegendTitle = styled.p<{ $level: number }>`
@@ -424,21 +569,36 @@ const LegendTitle = styled.p<{ $level: number }>`
           : "#dc2626"};
   margin-bottom: 0.2rem;
   letter-spacing: 0.5px;
+
+  @media (max-width: 768px) {
+    font-size: 0.38rem;
+    margin-bottom: 0.05rem;
+  }
 `;
 
 const LegendDesc = styled.p`
   font-family: "Rajdhani", sans-serif;
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 0.5rem;
+    line-height: 1.2;
+  }
 `;
 
 const ClosingPhrase = styled(motion.p)`
   font-family: "Rajdhani", sans-serif;
   font-size: 0.7rem;
   font-style: italic;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255, 255, 255, 0.66);
   margin-top: 0.75rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.45rem;
+    margin-top: 0.3rem;
+  }
 `;
 
 const wantedLevels = [
@@ -533,11 +693,11 @@ export default function ConfrontationSection() {
             FACÇÕES ATIVAS
           </Eyebrow>
           <MainTitle style={{ opacity: layer1Opacity, y: layer1Y }}>
-            Policial ou fora da lei?{" "}
-            <span style={{ color: "#d4af37" }}>A escolha é sua.</span>
+            Policial ou fora da lei?<br/>
+            <span style={{ color: "#d4af37" }}>A escolha é sua</span>
           </MainTitle>
           <Subtitle style={{ opacity: layer1Opacity, y: layer1Y }}>
-            Em Atlas RP, lei e crime não são só estética — são sistemas reais.
+            Em Atlas RP, lei e crime não são só estética são sistemas reais.<br/>
             Escolha seu caminho e viva as consequências dele.
           </Subtitle>
 
