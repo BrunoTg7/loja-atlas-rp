@@ -18,6 +18,14 @@
   --color-cod-surface: #121622;
   --color-cod-bg: #0B1725;
 
+  --color-atlas-gold: #C9A227;
+  --color-atlas-gold-light: #E8C468;
+  --color-atlas-bronze: #8B6914;
+  --color-atlas-dark: #0B0F1A;
+  --color-atlas-parchment: #F4EFE4;
+  --color-atlas-parchment-dark: #D4CFC4;
+
+  --font-cinzel: "Cinzel", serif;
   --font-orbitron: "Orbitron", sans-serif;
   --font-rajdhani: "Rajdhani", sans-serif;
   --font-anton: "Anton", sans-serif;
@@ -156,12 +164,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #FF2E44;
+  background: #F5A623;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FFCC00;
+  background: #ff1500;
 }
 
 .scrollbar-hide::-webkit-scrollbar {

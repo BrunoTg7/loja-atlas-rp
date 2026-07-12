@@ -55,7 +55,7 @@ const BenefitBadge = styled.div`
 const CTAButton = styled.span`
   display: inline-block;
   padding: 14px 32px;
-  background: linear-gradient(135deg, #d4af37, #b8941f);
+  background: linear-gradient(135deg, #f6b215ff, #d6a70bff);
   border: none;
   border-radius: 10px;
   font-family: 'Rajdhani', sans-serif;
@@ -113,7 +113,9 @@ export default function CTASection() {
 
   return (
     <>
-      <section className="py-12 md:py-20 px-4 relative overflow-hidden bg-[#05080F]">
+      <section className="py-12 md:py-20 px-4 relative overflow-hidden"style={{
+        background: "linear-gradient(to bottom, #0B1A3B, #0D1225 30%, #111828 70%, #080C18)",
+      }}>
         <div className="max-w-7xl mx-auto">
           {/* Welcome text */}
           <div className="text-center mb-8">

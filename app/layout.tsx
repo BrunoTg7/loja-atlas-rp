@@ -8,7 +8,7 @@ import { SteamProvider } from "@/context/SteamContext";
 import { CartProvider } from "@/context/CartContext";
 import { MarketingProvider } from "@/context/MarketingContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
-import { anton, orbitron, rajdhani } from "./fonts";
+import { anton, cinzel, orbitron, rajdhani } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Atlas RP - Loja Oficial",
@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${orbitron.variable} ${rajdhani.variable}`}>
+    <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${cinzel.variable} ${orbitron.variable} ${rajdhani.variable}`}>
       <body className="min-h-full flex flex-col">
         <a
           href="/api/internal/trap"

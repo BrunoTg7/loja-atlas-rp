@@ -11,7 +11,7 @@ function MobileMenu({ open, onClose, user, isAdmin }: { open: boolean; onClose: 
   return (
     <div className="fixed inset-0 z-40 md:hidden -mt-1">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-[60px] left-0 right-0 bg-[#0a0a0f]/98 border-b border-[#FF2E44]/20 p-6 shadow-xl">
+      <div className="absolute top-[60px] left-0 right-0 bg-[#0B1A3B]/98 border-b border-[#F5A623]/30 p-6 shadow-xl">
         <nav className="flex flex-col gap-4">
           <Link href="/" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Início</Link>
           <Link href="/atlas-coins" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas Coins</Link>
@@ -75,8 +75,8 @@ export default function Header() {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-[#FF2E44]/20">
-      <div className="max-w-7xl mx-auto py-2 px-4 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0B1A3B]/90 backdrop-blur-md border-b border-[#F5A623]/80">
+      <div className="max-w-full mx-auto py-2 px-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <div className="relative h-10 md:h-16 w-auto">

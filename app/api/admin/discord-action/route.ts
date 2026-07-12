@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/session";
-import { isStaffMember } from "@/lib/whitelistApi";
 import {
   addReaction,
   replyToMessage,
-  sendToLiberacao,
-  sendToLogSairDC,
-  sendToLogResetWebhook,
   saveToRegistry,
+  sendToLiberacao,
+  sendToLogResetWebhook,
+  sendToLogSairDC,
 } from "@/lib/discord";
+import { getSession } from "@/lib/session";
+import { isStaffMember } from "@/lib/whitelistApi";
+import { NextRequest, NextResponse } from "next/server";
 
 interface ActionPayload {
   messageId: string;
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       );
       await replyToMessage(
         body.messageId,
-        `✅ **Whitelist APROVADA** por <@${session.steamId}>\n>ID #${body.cityId} — ${body.steamName}`
+        `✅ **Whitelist APROVADA**>\n>ID #${body.cityId} — ${body.steamName}`
       ).catch((err) =>
         console.error("Erro ao responder mensagem (não bloqueante):", err)
       );
@@ -70,15 +70,19 @@ export async function POST(req: NextRequest) {
       await sendToLiberacao(body.cityId).catch((err) =>
         console.error("Erro ao enviar para liberacao (não bloqueante):", err)
       );
-      await sendToLogResetWebhook(
+      const logresetResult = await sendToLogResetWebhook(
         body.cityId,
         body.steamName,
         body.characterName,
         session.personaName,
         body.discord
-      ).catch((err) =>
-        console.error("Erro ao enviar para webhook logreset (não bloqueante):", err)
-      );
+      ).catch((err) => {
+        console.error("[LOGRESET] Erro ao enviar webhook:", err?.message || err);
+        return null;
+      });
+      if (logresetResult === null) {
+        console.error("[LOGRESET] Webhook falhou para cityId:", body.cityId, "steamName:", body.steamName);
+      }
       await saveToRegistry(
         body.cityId,
         body.steamId,

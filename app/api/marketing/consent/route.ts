@@ -1,7 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
-
-const MARKETING_CHANNEL_ID = "1525636856652239072";
+import { NextRequest, NextResponse } from "next/server";
 
 interface MarketingConsentPayload {
   email: string;
@@ -51,10 +49,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const webhookUrl = process.env.DISCORD_MARKETING_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const channelId = process.env.DISCORD_MARKETING_CHANNEL_ID;
+  if (!botToken || !channelId) {
     return NextResponse.json(
-      { error: "Webhook de marketing não configurado no servidor." },
+      { error: "Bot do Discord ou canal de marketing não configurado no servidor." },
       { status: 500 }
     );
   }
@@ -83,21 +82,25 @@ export async function POST(req: NextRequest) {
         { name: "Telefone/WhatsApp", value: consentData.phone || "Não informado", inline: true },
         { name: "Consentimento", value: consentData.consentText, inline: false },
         { name: "Data/Hora do Aceite", value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
-        { name: "Canal", value: `<#${MARKETING_CHANNEL_ID}>`, inline: true },
+        { name: "Canal", value: `<#${process.env.DISCORD_MARKETING_CHANNEL_ID}>`, inline: true },
       ],
       timestamp: new Date().toISOString(),
       footer: { text: "Atlas RP • Marketing Opt-in" },
     };
 
-    const discordRes = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        embeds: [embed],
-        username: "Atlas RP Marketing",
-        avatar_url: "https://cdn.discordapp.com/attachments/1523811762502238318/1524518600248004750/logo-atlas-rp.png?ex=6a53fe96&is=6a52ad16&hm=a9d0490ffaf411e6bd247606d10227ac66522e7bbfaac07a9edad20c7cb7be85&",
-      }),
-    });
+    const discordRes = await fetch(
+      `https://discord.com/api/v10/channels/${channelId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bot ${botToken}`,
+        },
+        body: JSON.stringify({
+          embeds: [embed],
+        }),
+      }
+    );
 
     if (!discordRes.ok) {
       const text = await discordRes.text();

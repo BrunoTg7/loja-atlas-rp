@@ -368,10 +368,13 @@ export async function sendToLogResetWebhook(
   discord?: string
 ): Promise<void> {
   if (!LOGRESET_WEBHOOK_URL) {
+    console.error("[LOGRESET] Variavel DISCORD_LOGRESET_webhook nao configurada no .env");
     throw new Error("Webhook de log reset não configurado");
   }
 
   const discordTag = discord ? ` (<@${discord}>)` : "";
+
+  console.log("[LOGRESET] Enviando webhook para:", LOGRESET_WEBHOOK_URL.substring(0, 60) + "...");
 
   const res = await fetch(LOGRESET_WEBHOOK_URL, {
     method: "POST",
@@ -384,8 +387,12 @@ export async function sendToLogResetWebhook(
   });
 
   if (!res.ok) {
-    throw new Error(`Erro ao enviar para webhook logreset: ${res.status}`);
+    const body = await res.text().catch(() => "N/A");
+    console.error("[LOGRESET] Webhook falhou:", res.status, res.statusText, body);
+    throw new Error(`Erro ao enviar para webhook logreset: ${res.status} - ${body}`);
   }
+
+  console.log("[LOGRESET] Webhook enviado com sucesso");
 }
 
 export async function sendToLogSairDC(cityId: string, characterName: string, motivo?: string): Promise<void> {

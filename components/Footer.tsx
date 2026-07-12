@@ -68,14 +68,14 @@ export default function Footer() {
 
   return (
     <>
-      <footer suppressHydrationWarning className="relative z-10 border-t border-[#d4af37]/10 bg-gradient-to-b from-[#0B0B0B] to-[#050308]">
-        <div className="max-w-7xl mx-auto px-4 pt-12 pb-8">
+      <footer suppressHydrationWarning className="relative z-10 border-t border-[#d4af37]/30 bg-gradient-to-b from-[#0B0B0B] to-[#050308]">
+        <div className="max-w-full mx-auto px-4 pt-12 pb-8">
           {/* Social */}
           <div className="text-center mb-8">
-            <p className="font-orbitron text-xs font-bold text-[#d4af37] uppercase tracking-[0.25em] mb-1">
+            <p className="font-orbitron text-[14px] font-bold text-[#d4af37] uppercase tracking-[0.25em] mb-1">
               Siga-nos
             </p>
-            <p className="font-rajdhani text-white/30 text-xs mb-5">
+            <p className="font-rajdhani text-white/80 text-[12px] mb-5">
               Fique por dentro de todas as novidades
             </p>
 
@@ -97,15 +97,15 @@ export default function Footer() {
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent mb-6" />
+          <div className="h-px bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent mb-6" />
 
           {/* Bottom */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <p className="font-rajdhani text-white/40 text-xs">
-                &copy; 2026 <span className="text-[#d4af37]/60">Atlas RP</span>. Todos os direitos reservados.
+              <p className="font-rajdhani text-white/90 text-[14px]">
+                &copy; 2026 <span className="text-[#d4af37]/80">Atlas RP</span>. Todos os direitos reservados.
               </p>
-              <p className="font-rajdhani text-white/25 text-[10px] mt-0.5">
+              <p className="font-rajdhani text-white/70 text-[12px] mt-0.5">
                 Este produto não é afiliado, endossado ou patrocinado pela Rockstar Games.
               </p>
             </div>
@@ -113,13 +113,13 @@ export default function Footer() {
             <div className="flex items-center gap-5">
               <button
                 onClick={() => setShowTerms(true)}
-                className="font-rajdhani text-white/40 hover:text-[#d4af37] transition-colors text-xs"
+                className="font-rajdhani text-white/70 hover:text-[#d4af37] transition-colors text-[12px]"
               >
                 Termos de Uso
               </button>
               <button
                 onClick={() => setShowPrivacy(true)}
-                className="font-rajdhani text-white/40 hover:text-[#d4af37] transition-colors text-xs"
+                className="font-rajdhani text-white/70 hover:text-[#d4af37] transition-colors text-[12px]"
               >
                 Política de Privacidade
               </button>
