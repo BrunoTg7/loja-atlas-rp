@@ -1,21 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getEncryptedCookie, setEncryptedCookie } from "@/lib/cookies";
 
-const COOKIE_CONSENT_KEY = "atlas_cookie_consent";
+const COOKIE_KEY = "hT4rC6yV9sA1dF8";
+const COOKIE_DAYS = 365;
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+    const consent = getEncryptedCookie(COOKIE_KEY);
     if (!consent) {
       setVisible(true);
     }
   }, []);
 
   const acceptCookies = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    setEncryptedCookie(COOKIE_KEY, "accepted", COOKIE_DAYS);
     setVisible(false);
   };
 

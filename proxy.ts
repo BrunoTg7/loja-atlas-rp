@@ -1,85 +1,88 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-const SESSION_COOKIE = "atlas_session";
-const SECRET = process.env.SESSION_SECRET || "atlas-rp-fallback-secret-change-me";
-const STAFF_IDS = (process.env.STAFF_STEAM_IDS || "")
-  .split(",")
-  .map((id) => id.trim())
-  .filter(Boolean);
+const BLOCKED_BOTS = [
+  /curl/i,
+  /wget/i,
+  /python/i,
+  /scrapy/i,
+  /phantom/i,
+  /headless/i,
+  /httrack/i,
+  /sitecopy/i,
+  /teleport/i,
+  /webcopier/i,
+  /webzip/i,
+  /clshttp/i,
+  /mass/i,
+  /nikto/i,
+  /sqlmap/i,
+  /nmap/i,
+  /dirbuster/i,
+  /gobuster/i,
+  /ffuf/i,
+  /burpsuite/i,
+  /owasp/i,
+  /acunetix/i,
+  /nessus/i,
+  /openvas/i,
+];
 
-function base64UrlDecode(str: string): ArrayBuffer {
-  const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = base64.length % 4 === 0 ? "" : "=".repeat(4 - (base64.length % 4));
-  const binary = atob(base64 + pad);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
+const BLOCKED_PATHS = [
+  /^\/_next\//,
+  /^\/api\/internal\//,
+  /^\/node_modules\//,
+  /^\/\.env/,
+  /^\/\.git/,
+  /^\/\.htaccess/,
+  /^\/config\//,
+  /^\/backup\//,
+];
+
+function isBlockedBot(ua: string | null): boolean {
+  if (!ua || ua.trim() === "") return true;
+  return BLOCKED_BOTS.some((pattern) => pattern.test(ua));
 }
 
-async function verifyJwt(
-  token: string
-): Promise<Record<string, unknown> | null> {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-
-    const [header, payload, signature] = parts;
-
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(SECRET),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["verify"]
-    );
-
-    const data = encoder.encode(`${header}.${payload}`);
-    const sig = base64UrlDecode(signature);
-
-    const valid = await crypto.subtle.verify("HMAC", key, sig, data);
-    if (!valid) return null;
-
-    const payloadBuffer = base64UrlDecode(payload);
-    const decoded = new TextDecoder().decode(payloadBuffer);
-    const parsed = JSON.parse(decoded);
-
-    if (parsed.exp && Date.now() / 1000 > parsed.exp) return null;
-
-    return parsed;
-  } catch {
-    return null;
-  }
+function isBlockedPath(pathname: string): boolean {
+  return BLOCKED_PATHS.some((pattern) => pattern.test(pathname));
 }
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const ua = request.headers.get("user-agent");
 
-  if (pathname.startsWith("/admin")) {
-    const token = request.cookies.get(SESSION_COOKIE)?.value;
-
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    const payload = await verifyJwt(token);
-
-    if (!payload) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    const steamId = payload.steamId as string;
-    if (!steamId || !STAFF_IDS.includes(steamId)) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (isBlockedBot(ua)) {
+    return new NextResponse(null, { status: 403 });
   }
 
-  return NextResponse.next();
+  if (isBlockedPath(pathname)) {
+    return new NextResponse(null, { status: 403 });
+  }
+
+  if (pathname === "/api/internal/trap") {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    console.log(
+      `[HONEYPOT] Blocked request from ${ip} | UA: ${ua} | Path: ${pathname}`
+    );
+    return new NextResponse(null, { status: 204 });
+  }
+
+  const response = NextResponse.next();
+
+  response.headers.set("X-DNS-Prefetch-Control", "on");
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains; preload"
+  );
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=()"
+  );
+
+  return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|Imagens/).*)"],
 };

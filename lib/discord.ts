@@ -10,6 +10,8 @@ export interface WhitelistRequest {
   steamName: string;
   characterName: string;
   age: string;
+  birthDate: string;
+  discord: string;
   rpExperience: string;
   characterStory: string;
   timestamp: string;
@@ -41,6 +43,8 @@ export function parseWhitelistEmbed(message: {
     steamName: getField(embed.fields, "Conta Steam"),
     characterName: getField(embed.fields, "Nome do personagem"),
     age: getField(embed.fields, "Idade"),
+    birthDate: getField(embed.fields, "Data de Nascimento"),
+    discord: getField(embed.fields, "Discord"),
     rpExperience: getField(embed.fields, "Já jogou RP?"),
     characterStory: getField(embed.fields, "História do personagem"),
     timestamp: embed.timestamp || message.embeds[0]?.timestamp || "",
@@ -65,13 +69,14 @@ export async function fetchWhitelistMessages(): Promise<WhitelistRequest[]> {
     id: string;
     embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
     reactions?: { emoji: { name: string }; count: number }[];
+    content?: string;
+    attachments?: { filename: string; url: string }[];
   }[] = await res.json();
 
-  return messages
+  const requests = messages
     .map(parseWhitelistEmbed)
     .filter((req): req is WhitelistRequest => {
       if (!req) return false;
-      // Filtrar mensagens que já foram processadas (com reação ✅ ou ❌)
       const msg = messages.find((m) => m.id === req.messageId);
       if (msg?.reactions) {
         const hasReaction = msg.reactions.some(
@@ -81,6 +86,162 @@ export async function fetchWhitelistMessages(): Promise<WhitelistRequest[]> {
       }
       return true;
     });
+
+  for (const req of requests) {
+    const msg = messages.find((m) => m.id === req.messageId);
+    const attachment = msg?.attachments?.find((a) => a.filename.startsWith("historia-"));
+    if (attachment?.url) {
+      try {
+        const fileRes = await fetch(attachment.url, { headers: getHeaders() });
+        if (fileRes.ok) {
+          const text = await fileRes.text();
+          const storyStart = text.indexOf("\n\n");
+          req.characterStory = storyStart !== -1 ? text.slice(storyStart + 2) : text;
+        }
+      } catch {}
+    }
+  }
+
+  return requests;
+}
+
+export interface WhitelistHistoryEntry extends WhitelistRequest {
+  status: "approved" | "rejected";
+  rejectReason?: string | null;
+}
+
+export async function fetchWhitelistHistory(): Promise<WhitelistHistoryEntry[]> {
+  if (!BOT_TOKEN || !CHANNEL_ID) {
+    throw new Error("Discord bot não configurado");
+  }
+
+  const res = await fetch(
+    `${DISCORD_API}/channels/${CHANNEL_ID}/messages?limit=100`,
+    { headers: getHeaders(), cache: "no-store" }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Erro ao buscar mensagens: ${res.status}`);
+  }
+
+  const messages: {
+    id: string;
+    embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
+    reactions?: { emoji: { name: string }; count: number }[];
+    content?: string;
+    message_reference?: { message_id: string };
+    attachments?: { filename: string; url: string }[];
+  }[] = await res.json();
+
+  const history: WhitelistHistoryEntry[] = [];
+
+  for (const msg of messages) {
+    if (!msg.embeds) continue;
+    const parsed = parseWhitelistEmbed(msg);
+    if (!parsed) continue;
+
+    const hasApproved = msg.reactions?.some((r) => r.emoji.name === "✅");
+    const hasRejected = msg.reactions?.some((r) => r.emoji.name === "❌");
+
+    if (hasApproved) {
+      history.push({ ...parsed, status: "approved", rejectReason: null });
+    } else if (hasRejected) {
+      let reason: string | null = null;
+      const rejectReply = messages.find(
+        (m) =>
+          m.content?.includes("Whitelist REPROVADA") &&
+          m.message_reference?.message_id === msg.id
+      );
+      if (rejectReply?.content) {
+        const motivoMatch = rejectReply.content.match(/Motivo:\s*(.+)/);
+        if (motivoMatch) {
+          reason = motivoMatch[1].trim();
+        }
+      }
+      history.push({ ...parsed, status: "rejected", rejectReason: reason });
+    }
+  }
+
+  for (const entry of history) {
+    const msg = messages.find((m) => m.id === entry.messageId);
+    const attachment = msg?.attachments?.find((a) => a.filename.startsWith("historia-"));
+    if (attachment?.url) {
+      try {
+        const fileRes = await fetch(attachment.url, { headers: getHeaders() });
+        if (fileRes.ok) {
+          const text = await fileRes.text();
+          const storyStart = text.indexOf("\n\n");
+          entry.characterStory = storyStart !== -1 ? text.slice(storyStart + 2) : text;
+        }
+      } catch {}
+    }
+  }
+
+  return history;
+}
+
+export interface WhitelistStatus {
+  exists: boolean;
+  status: "pending" | "approved" | "rejected" | null;
+  messageId: string | null;
+  rejectReason: string | null;
+}
+
+export async function checkWhitelistStatus(steamId: string): Promise<WhitelistStatus> {
+  if (!BOT_TOKEN || !CHANNEL_ID) {
+    throw new Error("Discord bot não configurado");
+  }
+
+  const res = await fetch(
+    `${DISCORD_API}/channels/${CHANNEL_ID}/messages?limit=100`,
+    { headers: getHeaders(), cache: "no-store" }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Erro ao buscar mensagens: ${res.status}`);
+  }
+
+  const messages: {
+    id: string;
+    embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
+    reactions?: { emoji: { name: string }; count: number }[];
+    content?: string;
+    message_reference?: { message_id: string };
+  }[] = await res.json();
+
+  for (const msg of messages) {
+    if (!msg.embeds) continue;
+    const embed = msg.embeds.find((e) => e.title === "Nova solicitação de Whitelist");
+    if (!embed || !embed.fields) continue;
+
+    const msgSteamId = getField(embed.fields, "Steam ID");
+    if (msgSteamId !== steamId) continue;
+
+    const hasApproved = msg.reactions?.some((r) => r.emoji.name === "✅");
+    const hasRejected = msg.reactions?.some((r) => r.emoji.name === "❌");
+
+    if (hasApproved) {
+      return { exists: true, status: "approved", messageId: msg.id, rejectReason: null };
+    }
+    if (hasRejected) {
+      let reason: string | null = null;
+      const rejectReply = messages.find(
+        (m) =>
+          m.content?.includes("Whitelist REPROVADA") &&
+          m.message_reference?.message_id === msg.id
+      );
+      if (rejectReply?.content) {
+        const motivoMatch = rejectReply.content.match(/Motivo:\s*(.+)/);
+        if (motivoMatch) {
+          reason = motivoMatch[1].trim();
+        }
+      }
+      return { exists: true, status: "rejected", messageId: msg.id, rejectReason: reason };
+    }
+    return { exists: true, status: "pending", messageId: msg.id, rejectReason: null };
+  }
+
+  return { exists: false, status: null, messageId: null, rejectReason: null };
 }
 
 export async function addReaction(
@@ -131,6 +292,7 @@ const LIBERACAO_WEBHOOK_URL = process.env.DISCORD_LIBERACAO_WEBHOOK_URL;
 const LIBERACAO_BOT_TOKEN = process.env.DISCORD_LIBERACAO_BOT_TOKEN;
 const LIBERACAO_USER_ID = process.env.DISCORD_LIBERACAO_USER_ID;
 const LOGRESET_CHANNEL_ID = process.env.DISCORD_LOGRESET_CHANNEL_ID;
+const LOGRESET_WEBHOOK_URL = process.env.DISCORD_LOGRESET_webhook;
 const LOGSAIRDC_CHANNEL_ID = process.env.DISCORD_LOGSAIRDC_CHANNEL_ID;
 const REGISTRY_CHANNEL_ID = process.env.DISCORD_REGISTRY_CHANNEL_ID;
 
@@ -168,6 +330,7 @@ export async function sendToLiberacao(cityId: string): Promise<void> {
     body: JSON.stringify({
       content: cityId,
       username: "Atlas RP Autenticação",
+      avatar_url: "https://cdn.discordapp.com/attachments/1523811762502238318/1524518600248004750/logo-atlas-rp.png?ex=6a53fe96&is=6a52ad16&hm=a9d0490ffaf411e6bd247606d10227ac66522e7bbfaac07a9edad20c7cb7be85&",
     }),
   });
 
@@ -194,6 +357,34 @@ export async function sendToLogReset(cityId: string, characterName: string): Pro
 
   if (!res.ok) {
     throw new Error(`Erro ao enviar para canal logreset: ${res.status}`);
+  }
+}
+
+export async function sendToLogResetWebhook(
+  cityId: string,
+  steamName: string,
+  characterName: string,
+  reviewerName: string,
+  discord?: string
+): Promise<void> {
+  if (!LOGRESET_WEBHOOK_URL) {
+    throw new Error("Webhook de log reset não configurado");
+  }
+
+  const discordTag = discord ? ` (<@${discord}>)` : "";
+
+  const res = await fetch(LOGRESET_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content: `✅ **Whitelist APROVADA**\n> Nome: **${characterName}**${discordTag}\n> ID: **#${cityId}**`,
+      username: "Atlas RP Whitelist",
+      avatar_url: "https://cdn.discordapp.com/attachments/1523811762502238318/1524518600248004750/logo-atlas-rp.png?ex=6a53fe96&is=6a52ad16&hm=a9d0490ffaf411e6bd247606d10227ac66522e7bbfaac07a9edad20c7cb7be85&",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Erro ao enviar para webhook logreset: ${res.status}`);
   }
 }
 

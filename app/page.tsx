@@ -143,25 +143,7 @@ export default function PaginaInicial() {
                   Proteção avançada contra trapaças, exploits e scripts maliciosos. Jogo limpo para todos.
                 </p>
               </div>
-
-              {/* Featured: Servidores Dedicados */}
-              <div className="md:col-span-2 bg-[#121622] p-4 md:p-6 clip-cut border border-[#FFCC00]/30 hover-lift reticule relative group">
-                <div className="flex items-start gap-3 md:gap-5">
-                  <div className="text-[#FFCC00] mb-2 md:mb-4 group-hover:scale-110 transition-transform duration-300 shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-orbitron text-lg md:text-xl font-bold text-white mb-2">SERVIDORES DEDICADOS</h3>
-                    <p className="font-rajdhani text-sm md:text-base text-[#B3B9C1]">
-                      Infraestrutura dedicada com alta disponibilidade, backups automáticos e suporte técnico 24h para garantir estabilidade e baixa latência.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mods Exclusivos */}
+  {/* Mods Exclusivos */}
               <div className="bg-[#121622] p-4 md:p-6 clip-cut border border-[#FFCC00]/20 hover-lift reticule relative group">
                 <div className="text-[#FFCC00] mb-2 md:mb-4 group-hover:scale-110 transition-transform duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,6 +155,24 @@ export default function PaginaInicial() {
                   Modificações customizadas que expandem as possibilidades do jogo base com novos recursos e funcionalidades.
                 </p>
               </div>
+              {/* Featured: Servidores Dedicados */}
+              <div className="md:col-span-2 bg-[#121622] p-4 md:p-6 clip-cut border border-[#FFCC00]/30 hover-lift reticule relative group">
+                <div className="flex items-start gap-3 md:gap-5">
+                  <div className="text-[#FFCC00] mb-2 md:mb-4 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-orbitron text-lg md:text-xl font-bold text-white mb-2">CONTENT EXCLUSIVO</h3>
+                    <p className="font-rajdhani text-sm md:text-base text-[#B3B9C1]">
+                      Mapas, veículos e recursos únicos criados exclusivamente para a experiência do Atlas RP.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            
             </div>
           </div>
         </div>

@@ -10,6 +10,8 @@ interface WhitelistRequest {
   steamName: string;
   characterName: string;
   age: string;
+  birthDate: string;
+  discord: string;
   rpExperience: string;
   characterStory: string;
   timestamp: string;
@@ -32,16 +34,17 @@ export default function AdminWhitelistTable({
   const [rejectModal, setRejectModal] = useState<string | null>(null);
   const [rejectMotivo, setRejectMotivo] = useState("");
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [storyModal, setStoryModal] = useState<WhitelistRequest | null>(null);
 
   const handleAction = useCallback(
-    async (messageId: string, action: "approve" | "reject", cityId: string, steamId: string, steamName: string, characterName: string, motivo?: string) => {
+    async (messageId: string, action: "approve" | "reject", cityId: string, steamId: string, steamName: string, characterName: string, motivo?: string, discord?: string) => {
       setActions((prev) => ({ ...prev, [messageId]: { status: "loading" } }));
 
       try {
         const discordRes = await fetch("/api/admin/discord-action", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messageId, action, cityId, steamId, steamName, characterName, motivo }),
+          body: JSON.stringify({ messageId, action, cityId, steamId, steamName, characterName, motivo, discord }),
         });
 
         if (!discordRes.ok) {
@@ -64,6 +67,14 @@ export default function AdminWhitelistTable({
     },
     [onAction]
   );
+
+  function formatStory(text: string) {
+    return text
+      .split(/\n/)
+      .filter((line) => line.trim())
+      .map((line) => line.trim())
+      .join("\n");
+  }
 
   if (requests.length === 0) {
     return (
@@ -145,7 +156,7 @@ export default function AdminWhitelistTable({
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleAction(req.messageId, "approve", req.cityId, req.steamId, req.steamName, req.characterName)}
+                            onClick={() => handleAction(req.messageId, "approve", req.cityId, req.steamId, req.steamName, req.characterName, undefined, req.discord)}
                             disabled={isProcessing}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors disabled:opacity-50"
                           >
@@ -195,6 +206,14 @@ export default function AdminWhitelistTable({
                 <p className="text-white">{req.age} anos</p>
               </div>
               <div>
+                <p className="text-gray-500 text-xs mb-1">Data de Nascimento</p>
+                <p className="text-white">{req.birthDate || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-gray-500 text-xs mb-1">Discord</p>
+                <p className="text-white">{req.discord || "N/A"}</p>
+              </div>
+              <div>
                 <p className="text-gray-500 text-xs mb-1">Steam Formatado</p>
                 <p className="text-white font-mono text-xs">{req.steamFormatted}</p>
               </div>
@@ -204,58 +223,149 @@ export default function AdminWhitelistTable({
               </div>
               <div className="sm:col-span-2">
                 <p className="text-gray-500 text-xs mb-1">Já jogou RP?</p>
-                <p className="text-white">{req.rpExperience}</p>
+                <p className="text-white whitespace-pre-wrap">{req.rpExperience}</p>
               </div>
               <div className="sm:col-span-2">
-                <p className="text-gray-500 text-xs mb-1">História do Personagem</p>
-                <p className="text-white/80 leading-relaxed">{req.characterStory}</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-gray-500 text-xs">História do Personagem</p>
+                  <button
+                    onClick={() => setStoryModal(req)}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    Ver completa
+                  </button>
+                </div>
+                <div className="bg-[#18181c] rounded-lg border border-white/5 p-4 max-h-60 overflow-y-auto">
+                  <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{formatStory(req.characterStory)}</p>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{req.characterStory.length} caracteres</p>
               </div>
             </div>
           </div>
         );
       })()}
 
-      {/* Reject Modal */}
-      {rejectModal !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="w-full max-w-md bg-[#18181c] border border-white/10 rounded-2xl p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white mb-2">Reprovar Whitelist</h3>
-            <p className="text-sm text-gray-400 mb-4">Informe o motivo da reprovação (opcional).</p>
-            <textarea
-              value={rejectMotivo}
-              onChange={(e) => setRejectMotivo(e.target.value)}
-              placeholder="Ex: História não condiz com o servidor, informações incompletas..."
-              rows={3}
-              className="w-full resize-none rounded-lg border border-white/10 bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-red-400"
-            />
-            <div className="flex justify-end gap-3 mt-4">
+      {/* Story Full Modal */}
+      {storyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="w-full max-w-4xl bg-[#18181c] border border-white/10 rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <div>
+                <h3 className="text-lg font-semibold text-white">História do Personagem</h3>
+                <p className="text-sm text-gray-400">{storyModal.characterName} — {storyModal.steamName}</p>
+              </div>
               <button
-                onClick={() => { setRejectModal(null); setRejectMotivo(""); }}
-                className="rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium px-5 py-2.5"
+                onClick={() => setStoryModal(null)}
+                className="text-gray-400 hover:text-white transition-colors"
               >
-                Cancelar
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap">
+                {formatStory(storyModal.characterStory)}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
+              <p className="text-xs text-gray-500">{storyModal.characterStory.length} caracteres</p>
               <button
-                onClick={() => {
-                  const req = requests.find((r) => r.messageId === rejectModal);
-                  if (req) {
-                    handleAction(rejectModal, "reject", req.cityId, req.steamId, req.steamName, req.characterName, rejectMotivo.trim() || undefined);
-                    setRejectModal(null);
-                    setRejectMotivo("");
-                  }
-                }}
-                disabled={actions[rejectModal]?.status === "loading"}
-                className="rounded-lg bg-red-500 hover:bg-red-400 disabled:opacity-60 transition-colors text-white text-sm font-medium px-5 py-2.5 flex items-center gap-2"
+                onClick={() => setStoryModal(null)}
+                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-white transition-colors"
               >
-                {actions[rejectModal]?.status === "loading" && (
-                  <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                )}
-                Confirmar Reprovação
+                Fechar
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Reject Modal */}
+      {rejectModal !== null && (() => {
+        const req = requests.find((r) => r.messageId === rejectModal);
+        const actionState = actions[rejectModal];
+        const isSuccess = actionState?.status === "success";
+        const isError = actionState?.status === "error";
+        const isLoading = actionState?.status === "loading";
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+            <div className="w-full max-w-md bg-[#18181c] border border-white/10 rounded-2xl p-6 shadow-2xl">
+              {isSuccess ? (
+                <div className="text-center py-4">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2">
+                      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Reprovado com sucesso</h3>
+                  <p className="text-sm text-gray-400">
+                    Whitelist de <strong>{req?.steamName}</strong> foi reprovada.
+                  </p>
+                </div>
+              ) : isError ? (
+                <div className="text-center py-4">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                      <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Erro ao reprovar</h3>
+                  <p className="text-sm text-red-400">{actionState?.error || "Tente novamente."}</p>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-lg font-semibold text-white mb-2">Reprovar Whitelist</h3>
+                  <p className="text-sm text-gray-400 mb-4">Informe o motivo da reprovação (opcional).</p>
+                  <textarea
+                    value={rejectMotivo}
+                    onChange={(e) => setRejectMotivo(e.target.value)}
+                    placeholder="Ex: História não condiz com o servidor, informações incompletas..."
+                    rows={3}
+                    disabled={isLoading}
+                    className="w-full resize-none rounded-lg border border-white/10 bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-red-400 disabled:opacity-50"
+                  />
+                </>
+              )}
+              <div className="flex justify-end gap-3 mt-4">
+                {(isSuccess || isError) ? (
+                  <button
+                    onClick={() => { setRejectModal(null); setRejectMotivo(""); }}
+                    className="rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium px-5 py-2.5"
+                  >
+                    Fechar
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => { setRejectModal(null); setRejectMotivo(""); }}
+                      disabled={isLoading}
+                      className="rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium px-5 py-2.5"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (req) {
+                          handleAction(rejectModal, "reject", req.cityId, req.steamId, req.steamName, req.characterName, rejectMotivo.trim() || undefined, req.discord);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="rounded-lg bg-red-500 hover:bg-red-400 disabled:opacity-60 transition-colors text-white text-sm font-medium px-5 py-2.5 flex items-center gap-2"
+                    >
+                      {isLoading && (
+                        <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                      )}
+                      Confirmar Reprovação
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }

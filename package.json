@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:clean": "rimraf .next && next dev",
+    "dev:clean": "powershell -Command \"Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1\" && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "clean": "rimraf .next"
+    "clean": "powershell -Command \"Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue\""
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

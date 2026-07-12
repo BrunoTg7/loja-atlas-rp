@@ -3,8 +3,10 @@ import "./globals.css";
 import Header from "@/components/Header";
 import ClientFooter from "@/components/ClientFooter";
 import CookieBanner from "@/components/CookieBanner";
+import MarketingNotification from "@/components/MarketingNotification";
 import { SteamProvider } from "@/context/SteamContext";
 import { CartProvider } from "@/context/CartContext";
+import { MarketingProvider } from "@/context/MarketingContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import { anton, orbitron, rajdhani } from "./fonts";
 
@@ -45,15 +47,36 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${orbitron.variable} ${rajdhani.variable}`}>
       <body className="min-h-full flex flex-col">
+        <a
+          href="/api/internal/trap"
+          aria-hidden="true"
+          tabIndex={-1}
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            padding: 0,
+            margin: "-1px",
+            overflow: "hidden",
+            clip: "rect(0,0,0,0)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
+          hidden trap link
+        </a>
         <StyledComponentsRegistry>
           <SteamProvider>
             <CartProvider>
-              <Header />
-              <main className="flex-1 pt-16">
-                {children}
-              </main>
-              <ClientFooter />
-              <CookieBanner />
+              <MarketingProvider>
+                <Header />
+                <main className="flex-1 pt-16">
+                  {children}
+                </main>
+                <ClientFooter />
+                <CookieBanner />
+                <MarketingNotification />
+              </MarketingProvider>
             </CartProvider>
           </SteamProvider>
         </StyledComponentsRegistry>

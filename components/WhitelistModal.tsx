@@ -3,6 +3,7 @@
 import { useSteam } from "@/context/SteamContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { getEncryptedCookie, setEncryptedCookie, deleteCookie } from "@/lib/cookies";
 
 interface WhitelistModalProps {
   open: boolean;
@@ -12,7 +13,8 @@ interface WhitelistModalProps {
 interface FormState {
   cityId: string;
   characterName: string;
-  age: string;
+  discord: string;
+  birthDate: string;
   rpExperience: string;
   characterStory: string;
 }
@@ -20,70 +22,53 @@ interface FormState {
 const initialForm: FormState = {
   cityId: "",
   characterName: "",
-  age: "",
+  discord: "",
+  birthDate: "",
   rpExperience: "",
   characterStory: "",
 };
 
-type Step = "login" | "form";
+type Step = "login" | "form" | "error-underage" | "already-pending" | "already-approved" | "resubmit-after-reject";
 type Status = "idle" | "loading" | "success" | "error";
 
-const STORAGE_KEY = "atlas_whitelist_draft";
-const STORAGE_TTL = 24 * 60 * 60 * 1000;
-const ENC_KEY = "atlas-rp-wl-2024";
-
-function encrypt(data: string): string {
-  let result = "";
-  for (let i = 0; i < data.length; i++) {
-    result += String.fromCharCode(
-      data.charCodeAt(i) ^ ENC_KEY.charCodeAt(i % ENC_KEY.length)
-    );
-  }
-  return btoa(result);
-}
-
-function decrypt(data: string): string {
-  try {
-    const decoded = atob(data);
-    let result = "";
-    for (let i = 0; i < decoded.length; i++) {
-      result += String.fromCharCode(
-        decoded.charCodeAt(i) ^ ENC_KEY.charCodeAt(i % ENC_KEY.length)
-      );
-    }
-    return result;
-  } catch {
-    return "";
-  }
-}
+const COOKIE_KEY = "jK5nB3xQ8wM2pL6";
+const COOKIE_DAYS = 1;
+const MIN_AGE = 18;
+const DISCORD_INVITE = "https://discord.gg/e426pZyTCp";
 
 function saveDraft(form: FormState, step: Step) {
-  try {
-    const payload = JSON.stringify({ form, step, ts: Date.now() });
-    localStorage.setItem(STORAGE_KEY, encrypt(payload));
-  } catch {}
+  setEncryptedCookie(COOKIE_KEY, JSON.stringify({ form, step, ts: Date.now() }), COOKIE_DAYS);
 }
 
 function loadDraft(): { form: FormState; step: Step } | null {
+  const raw = getEncryptedCookie(COOKIE_KEY);
+  if (!raw) return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const decoded = decrypt(raw);
-    if (!decoded) return null;
-    const { form, step, ts } = JSON.parse(decoded);
-    if (Date.now() - ts > STORAGE_TTL) {
-      localStorage.removeItem(STORAGE_KEY);
+    const { form, step, ts } = JSON.parse(raw);
+    if (Date.now() - ts > 24 * 60 * 60 * 1000) {
+      deleteCookie(COOKIE_KEY);
       return null;
     }
     return { form, step: step || "form" };
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    deleteCookie(COOKIE_KEY);
     return null;
   }
 }
 
 function clearDraft() {
-  localStorage.removeItem(STORAGE_KEY);
+  deleteCookie(COOKIE_KEY);
+}
+
+function calculateAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
 }
 
 function validate(form: FormState): Record<string, string> {
@@ -91,10 +76,24 @@ function validate(form: FormState): Record<string, string> {
   if (!form.cityId.trim()) e.cityId = "Informe o ID da cidade.";
   if (!form.characterName.trim())
     e.characterName = "Informe o nome do personagem.";
-  if (!form.age.trim()) {
-    e.age = "Informe sua idade.";
-  } else if (Number(form.age) < 16) {
-    e.age = "Idade mínima de 16 anos.";
+  if (!form.discord.trim()) {
+    e.discord = "Informe seu Discord.";
+  } else if (!/^\d{17,20}$/.test(form.discord.trim())) {
+    e.discord = "Informe um Discord User ID válido (número).";
+  }
+  if (!form.birthDate.trim()) {
+    e.birthDate = "Informe sua data de nascimento.";
+  } else {
+    const parts = form.birthDate.split("-");
+    const year = parseInt(parts[0], 10);
+    if (year < 1950 || year > 2008) {
+      e.birthDate = "Data de nascimento inválida.";
+    } else {
+      const age = calculateAge(form.birthDate);
+      if (age < MIN_AGE) {
+        e.birthDate = `Idade mínima de ${MIN_AGE} anos.`;
+      }
+    }
   }
   if (!form.rpExperience.trim())
     e.rpExperience = "Conte um pouco da sua experiência.";
@@ -116,6 +115,7 @@ export default function WhitelistModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [rejectReason, setRejectReason] = useState<string | null>(null);
   const firstFieldRef = useRef<HTMLInputElement | null>(null);
   const storyRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -127,13 +127,35 @@ export default function WhitelistModal({
         setStep("login");
         setForm(initialForm);
       } else {
-        const draft = loadDraft();
-        if (draft && draft.form.cityId && draft.step === "form") {
-          setForm(draft.form);
-        } else {
-          setForm(draft?.form || initialForm);
-        }
-        setStep("form");
+        fetch("/api/whitelist/status")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "approved") {
+              setStep("already-approved");
+            } else if (data.status === "pending") {
+              setStep("already-pending");
+            } else if (data.status === "rejected") {
+              setRejectReason(data.rejectReason || null);
+              setStep("resubmit-after-reject");
+            } else {
+              const draft = loadDraft();
+              if (draft && draft.form.cityId && draft.step === "form") {
+                setForm(draft.form);
+              } else {
+                setForm(draft?.form || initialForm);
+              }
+              setStep("form");
+            }
+          })
+          .catch(() => {
+            const draft = loadDraft();
+            if (draft && draft.form.cityId && draft.step === "form") {
+              setForm(draft.form);
+            } else {
+              setForm(draft?.form || initialForm);
+            }
+            setStep("form");
+          });
       }
       setErrors({});
       setStatus("idle");
@@ -163,6 +185,10 @@ export default function WhitelistModal({
     setErrors((prev) => ({ ...prev, [field]: "" }));
   }
 
+  function handleBirthDateChange(value: string) {
+    updateField("birthDate", value);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -170,6 +196,12 @@ export default function WhitelistModal({
     if (Object.keys(clientErrors).length > 0) {
       setErrors(clientErrors);
       setStatus("idle");
+      return;
+    }
+
+    const age = calculateAge(form.birthDate);
+    if (age < MIN_AGE) {
+      setStep("error-underage");
       return;
     }
 
@@ -255,16 +287,185 @@ export default function WhitelistModal({
                   id="whitelist-title"
                   className="text-lg font-semibold text-white mb-2"
                 >
-                  Whitelist enviada!
+                  Whitelist enviada com sucesso!
                 </h2>
                 <p className="text-sm text-gray-400 mb-6">
-                  Nossa equipe vai analisar e responder em breve.
+                  Entre no nosso Discord e aguarde na sala &apos;Liberar ID&apos;.
+                  Nossa equipe vai analisar sua solicitação em breve.
+                </p>
+                <a
+                  href={DISCORD_INVITE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white font-medium py-2.5 inline-block"
+                >
+                  Entrar no Discord
+                </a>
+              </div>
+
+            /* ===== ERROR: UNDERAGE ===== */
+            ) : step === "error-underage" ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#f87171"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </div>
+                <h2
+                  id="whitelist-title"
+                  className="text-lg font-semibold text-white mb-2"
+                >
+                  Não foi possível concluir sua Whitelist
+                </h2>
+                <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                  Nossa comunidade é destinada a maiores de 18 anos.
+                  Se você acredita que isso é um engano ou deseja explicar seu caso,
+                  entre no nosso Discord e abra um ticket detalhando a situação.
+                </p>
+                <a
+                  href={DISCORD_INVITE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white font-medium py-2.5 inline-block mb-3"
+                >
+                  Entrar no Discord
+                </a>
+                <button
+                  onClick={() => {
+                    setStep("form");
+                    setErrors({});
+                  }}
+                  className="w-full rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium py-2.5"
+                >
+                  Voltar ao formulário
+                </button>
+              </div>
+
+            /* ===== ALREADY PENDING ===== */
+            ) : step === "already-pending" ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#f59e0b"
+                    strokeWidth="2"
+                  >
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h2
+                  id="whitelist-title"
+                  className="text-lg font-semibold text-white mb-2"
+                >
+                  Whitelist já enviada
+                </h2>
+                <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                  Você já possui uma solicitação de whitelist em análise.
+                  Aguarde a aprovação ou reprovação da nossa equipe.
+                </p>
+                <a
+                  href={DISCORD_INVITE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white font-medium py-2.5 inline-block"
+                >
+                  Entrar no Discord
+                </a>
+              </div>
+
+            /* ===== ALREADY APPROVED ===== */
+            ) : step === "already-approved" ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#34d399"
+                    strokeWidth="2"
+                  >
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h2
+                  id="whitelist-title"
+                  className="text-lg font-semibold text-white mb-2"
+                >
+                  Whitelist aprovada!
+                </h2>
+                <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                  Sua whitelist já foi aprovada e está ativa.
+                  Você já pode acessar o servidor!
+                </p>
+                <a
+                  href={DISCORD_INVITE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white font-medium py-2.5 inline-block"
+                >
+                  Entrar no Discord
+                </a>
+              </div>
+
+            /* ===== REJECTED: CAN RESUBMIT ===== */
+            ) : step === "resubmit-after-reject" ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#f87171"
+                    strokeWidth="2"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h2
+                  id="whitelist-title"
+                  className="text-lg font-semibold text-white mb-2"
+                >
+                  Whitelist reprovada
+                </h2>
+                <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                  Sua anterior foi reprovada pela equipe.
+                </p>
+                {rejectReason && (
+                  <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <p className="text-xs text-red-400 uppercase tracking-wider mb-1">Motivo:</p>
+                    <p className="text-sm text-white/80">{rejectReason}</p>
+                  </div>
+                )}
+                <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                  Você pode enviar uma nova solicitação. Corrija os problemas mencionados acima.
                 </p>
                 <button
-                  onClick={onClose}
+                  onClick={() => {
+                    const draft = loadDraft();
+                    if (draft && draft.form.cityId && draft.step === "form") {
+                      setForm(draft.form);
+                    } else {
+                      setForm(initialForm);
+                    }
+                    setStep("form");
+                  }}
                   className="w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white font-medium py-2.5"
                 >
-                  Fechar
+                  Enviar nova solicitação
                 </button>
               </div>
 
@@ -391,13 +592,40 @@ export default function WhitelistModal({
                     error={errors.characterName}
                   />
                   <Field
-                    label="Idade"
-                    placeholder="ex: 18"
-                    type="number"
-                    value={form.age}
-                    onChange={(v) => updateField("age", v)}
-                    error={errors.age}
+                    label="Seu Discord (User ID)"
+                    placeholder="Exemplo: 1184991819952562199"
+                    value={form.discord}
+                    onChange={(v) => updateField("discord", v)}
+                    error={errors.discord}
                   />
+                  <p className="text-xs text-gray-500 -mt-1 mb-2">
+                    Ative o Modo Desenvolvedor no Discord e copie seu ID com botão direito no seu nome.
+                  </p>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1.5">
+                      Data de Nascimento <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={form.birthDate}
+                      onChange={(e) => handleBirthDateChange(e.target.value)}
+                      min="1950-01-01"
+                      max="2008-12-31"
+                      className={`w-full rounded-lg border bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none ${
+                        errors.birthDate
+                          ? "border-red-500/60 focus:border-red-400"
+                          : "border-white/10 focus:border-indigo-400"
+                      }`}
+                    />
+                    {errors.birthDate && (
+                      <p className="mt-1 text-xs text-red-400">
+                        {errors.birthDate}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-white/40">
+                      Apenas maiores de 18 anos.
+                    </p>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-1.5">
                       Já jogou RP? <span className="text-red-500">*</span>
@@ -438,17 +666,16 @@ export default function WhitelistModal({
                         updateField("characterStory", e.target.value);
                         const textarea = e.target;
                         textarea.style.height = "auto";
-                        const newHeight = Math.min(textarea.scrollHeight, 200);
-                        textarea.style.height = `${newHeight}px`;
+                        textarea.style.height = `${textarea.scrollHeight}px`;
                       }}
                       placeholder="Crie uma história breve para seu personagem"
-                      rows={2}
-                      className={`w-full resize-none rounded-lg border bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none scrollbar-hide overflow-hidden transition-all duration-200 ${
+                      rows={4}
+                      className={`w-full resize-y rounded-lg border bg-[#0f0f12] px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none scrollbar-hide transition-all duration-200 ${
                         errors.characterStory
                           ? "border-red-500/60 focus:border-red-400"
                           : "border-white/10 focus:border-indigo-400"
                       }`}
-                      style={{ scrollbarWidth: "none", msOverflowStyle: "none", minHeight: "42px" }}
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none", minHeight: "100px", maxHeight: "400px" }}
                     />
                     {errors.characterStory && (
                       <p className="mt-1 text-xs text-red-400">

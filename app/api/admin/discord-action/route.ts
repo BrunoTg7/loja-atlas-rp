@@ -5,6 +5,8 @@ import {
   addReaction,
   replyToMessage,
   sendToLiberacao,
+  sendToLogSairDC,
+  sendToLogResetWebhook,
   saveToRegistry,
 } from "@/lib/discord";
 
@@ -16,6 +18,7 @@ interface ActionPayload {
   steamId: string;
   steamName: string;
   characterName: string;
+  discord?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -67,6 +70,15 @@ export async function POST(req: NextRequest) {
       await sendToLiberacao(body.cityId).catch((err) =>
         console.error("Erro ao enviar para liberacao (não bloqueante):", err)
       );
+      await sendToLogResetWebhook(
+        body.cityId,
+        body.steamName,
+        body.characterName,
+        session.personaName,
+        body.discord
+      ).catch((err) =>
+        console.error("Erro ao enviar para webhook logreset (não bloqueante):", err)
+      );
       await saveToRegistry(
         body.cityId,
         body.steamId,
@@ -88,8 +100,8 @@ export async function POST(req: NextRequest) {
         console.error("Erro ao responder mensagem (não bloqueante):", err)
       );
 
-      await sendToLiberacao(body.cityId).catch((err) =>
-        console.error("Erro ao enviar para liberacao (não bloqueante):", err)
+      await sendToLogSairDC(body.cityId, body.characterName, body.motivo).catch((err) =>
+        console.error("Erro ao enviar para log de reprovação (não bloqueante):", err)
       );
     }
 
