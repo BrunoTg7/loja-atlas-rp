@@ -6,7 +6,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Section = styled.section`
@@ -548,6 +548,14 @@ const FormButton = styled.button`
 `;
 
 function GoldenParticles() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
       {Array.from({ length: 10 }).map((_, i) => (
