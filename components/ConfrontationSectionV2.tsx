@@ -6,7 +6,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 
 const Section = styled.section`
@@ -307,32 +307,35 @@ const ClosingLine = styled.p`
 `;
 
 function GoldenParticles() {
+  const [particles, setParticles] = useState<{ left: string; bg: string; yEnd: number; xEnd: number; duration: number }[]>([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 14 }).map((_, i) => ({
+        left: `${8 + Math.random() * 84}%`,
+        bg: i % 3 === 0
+          ? "rgba(245,166,35,0.5)"
+          : i % 3 === 1
+            ? "rgba(220,80,60,0.4)"
+            : "rgba(255,200,87,0.45)",
+        yEnd: -800 - Math.random() * 250,
+        xEnd: (Math.random() - 0.5) * 70,
+        duration: 6 + Math.random() * 4,
+      }))
+    );
+  }, []);
+
+  if (particles.length === 0) return <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden" />;
+
   return (
     <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
-      {Array.from({ length: 14 }).map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1.5 h-1.5 rounded-full"
-          style={{
-            left: `${8 + Math.random() * 84}%`,
-            bottom: "-3%",
-            background: i % 3 === 0
-              ? "rgba(245,166,35,0.5)"
-              : i % 3 === 1
-                ? "rgba(220,80,60,0.4)"
-                : "rgba(255,200,87,0.45)",
-          }}
-          animate={{
-            y: [0, -800 - Math.random() * 250],
-            opacity: [0, 0.7, 0],
-            x: [0, (Math.random() - 0.5) * 70],
-          }}
-          transition={{
-            duration: 6 + Math.random() * 4,
-            repeat: Infinity,
-            delay: i * 0.7,
-            ease: "easeOut",
-          }}
+          style={{ left: p.left, bottom: "-3%", background: p.bg }}
+          animate={{ y: [0, p.yEnd], opacity: [0, 0.7, 0], x: [0, p.xEnd] }}
+          transition={{ duration: p.duration, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
         />
       ))}
     </div>

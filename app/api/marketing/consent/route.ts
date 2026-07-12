@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       color: 0xd4af37,
       fields: [
         { name: "Steam ID", value: consentData.steamId, inline: true },
-        { name: "Steam Formatado", value: consentData.steamIdFormatted, inline: true },
+        { name: "Steam3 Hex", value: consentData.steamIdFormatted, inline: true },
         { name: "Nome Steam", value: consentData.personaName, inline: true },
         { name: "E-mail", value: consentData.email || "Não informado", inline: true },
         { name: "Telefone/WhatsApp", value: consentData.phone || "Não informado", inline: true },

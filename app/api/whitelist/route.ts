@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { sanitizeInput, hasSuspiciousContent } from "@/lib/sanitize";
 import { checkWhitelistStatus } from "@/lib/discord";
+import { encrypt } from "@/lib/crypto";
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const MIN_AGE = 18;
@@ -142,16 +143,16 @@ export async function POST(req: NextRequest) {
     color: 0x6366f1,
     fields: [
       { name: "ID na cidade", value: cleanCityId, inline: true },
-      { name: "Steam ID", value: session.steamId, inline: true },
+      { name: "Steam ID", value: encrypt(session.steamId), inline: true },
       {
-        name: "Steam Formatado",
-        value: session.steamIdFormatted,
+        name: "Steam3 Hex",
+        value: encrypt(session.steamIdFormatted),
         inline: true,
       },
-      { name: "Conta Steam", value: session.personaName, inline: true },
+      { name: "Conta Steam", value: encrypt(session.personaName), inline: true },
       { name: "Idade", value: String(age), inline: true },
-      { name: "Data de Nascimento", value: birthDate, inline: true },
-      { name: "Discord", value: cleanDiscord, inline: true },
+      { name: "Data de Nascimento", value: encrypt(birthDate), inline: true },
+      { name: "Discord", value: encrypt(cleanDiscord), inline: true },
       { name: "Nome do personagem", value: cleanCharacterName, inline: false },
       {
         name: "Já jogou RP?",

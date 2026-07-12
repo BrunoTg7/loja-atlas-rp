@@ -1,30 +1,33 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 
 function GoldenParticles() {
+  const [particles, setParticles] = useState<{ left: string; yEnd: number; xEnd: number; duration: number }[]>([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 8 }).map(() => ({
+        left: `${8 + Math.random() * 84}%`,
+        yEnd: -600 - Math.random() * 200,
+        xEnd: (Math.random() - 0.5) * 40,
+        duration: 8 + Math.random() * 4,
+      }))
+    );
+  }, []);
+
+  if (particles.length === 0) return <div className="absolute inset-0 pointer-events-none overflow-hidden" />;
+
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {Array.from({ length: 8 }).map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-[#C9A227]/20"
-          style={{
-            left: `${8 + Math.random() * 84}%`,
-            bottom: "-3%",
-          }}
-          animate={{
-            y: [0, -600 - Math.random() * 200],
-            opacity: [0, 0.4, 0],
-            x: [0, (Math.random() - 0.5) * 40],
-          }}
-          transition={{
-            duration: 8 + Math.random() * 4,
-            repeat: Infinity,
-            delay: i * 1.2,
-            ease: "easeOut",
-          }}
+          style={{ left: p.left, bottom: "-3%" }}
+          animate={{ y: [0, p.yEnd], opacity: [0, 0.4, 0], x: [0, p.xEnd] }}
+          transition={{ duration: p.duration, repeat: Infinity, delay: i * 1.2, ease: "easeOut" }}
         />
       ))}
     </div>

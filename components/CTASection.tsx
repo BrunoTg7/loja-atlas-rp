@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import TicketHolografico from "./TicketHolografico";
 import WhitelistModal from "./WhitelistModal";
+import { useSteam } from "@/context/SteamContext";
 
 const FadeIn = styled.div<{ $visible: boolean }>`
   opacity: ${p => p.$visible ? 1 : 0};
@@ -98,6 +99,7 @@ const benefits = [
 ];
 
 export default function CTASection() {
+  const { user } = useSteam();
   const [ticketState, setTicketState] = useState<"locked" | "analyzing" | "unlocked">("locked");
   const [whitelistOpen, setWhitelistOpen] = useState(false);
   const [fiveMOpen, setFiveMOpen] = useState(false);
@@ -240,7 +242,12 @@ export default function CTASection() {
 
             {/* Right - Ticket */}
             <div className="order-1 lg:order-2 flex justify-center">
-              <TicketHolografico unlocked={ticketState === "unlocked"} />
+              <TicketHolografico
+                unlocked={ticketState === "unlocked"}
+                avatar={user?.avatar || ""}
+                name={user?.personaName || ""}
+                cityId=""
+              />
             </div>
           </div>
         </div>

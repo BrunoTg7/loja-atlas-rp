@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       profileUrl: profile?.profileurl || "",
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
     const response = NextResponse.redirect(new URL("/", baseUrl));
     response.cookies.set(sessionCookieName(), token, {
       httpOnly: true,
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     return response;
   } catch (error) {
     console.error("Steam callback error:", error);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
     return NextResponse.redirect(
       new URL("/?error=steam_auth_failed", baseUrl)
     );

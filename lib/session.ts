@@ -1,9 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const SESSION_COOKIE = "atlas_session";
+const SESSION_COOKIE = process.env.SESSION_COOKIE!;
 const SECRET = new TextEncoder().encode(
-  process.env.SESSION_SECRET || "atlas-rp-fallback-secret-change-me"
+  process.env.SESSION_SECRET
 );
 
 export interface SessionData {

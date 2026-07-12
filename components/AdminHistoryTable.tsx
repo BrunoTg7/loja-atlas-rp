@@ -144,7 +144,7 @@ export default function AdminHistoryTable({ history }: AdminHistoryTableProps) {
                 <p className="text-white">{entry.discord || "N/A"}</p>
               </div>
               <div>
-                <p className="text-gray-500 text-xs mb-1">Steam Formatado</p>
+                <p className="text-gray-500 text-xs mb-1">Steam3 Hex</p>
                 <p className="text-white font-mono text-xs">{entry.steamFormatted}</p>
               </div>
               <div>

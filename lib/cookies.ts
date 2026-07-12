@@ -1,5 +1,5 @@
 function getEncKey(): string {
-  return process.env.NEXT_PUBLIC_COOKIE_SECRET || "";
+  return process.env.NEXT_PUBLIC_COOKIE_SECRET!;
 }
 
 function xorEncode(data: string, key: string): Uint8Array {

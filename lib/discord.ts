@@ -2,6 +2,8 @@ const DISCORD_API = "https://discord.com/api/v10";
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const CHANNEL_ID = process.env.DISCORD_WL_CHANNEL_ID;
 
+import { decrypt } from "@/lib/crypto";
+
 export interface WhitelistRequest {
   messageId: string;
   cityId: string;
@@ -28,6 +30,39 @@ function getField(fields: { name: string; value: string }[], name: string): stri
   return fields.find((f) => f.name === name)?.value || "";
 }
 
+type DiscordMessage = {
+  id: string;
+  embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
+  reactions?: { emoji: { name: string }; count: number }[];
+  content?: string;
+  message_reference?: { message_id: string };
+  attachments?: { filename: string; url: string }[];
+};
+
+async function fetchAllMessages(channelId: string, limit = 0): Promise<DiscordMessage[]> {
+  const all: DiscordMessage[] = [];
+  let before: string | undefined;
+  const max = limit || Infinity;
+
+  while (all.length < max) {
+    const batchSize = Math.min(100, max - all.length);
+    const url = new URL(`${DISCORD_API}/channels/${channelId}/messages`);
+    url.searchParams.set("limit", String(batchSize));
+    if (before) url.searchParams.set("before", before);
+
+    const res = await fetch(url.toString(), { headers: getHeaders(), cache: "no-store" });
+    if (!res.ok) break;
+
+    const batch: DiscordMessage[] = await res.json();
+    if (batch.length === 0) break;
+
+    all.push(...batch);
+    before = batch[batch.length - 1].id;
+  }
+
+  return all;
+}
+
 export function parseWhitelistEmbed(message: {
   id: string;
   embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
@@ -38,13 +73,13 @@ export function parseWhitelistEmbed(message: {
   return {
     messageId: message.id,
     cityId: getField(embed.fields, "ID na cidade"),
-    steamId: getField(embed.fields, "Steam ID"),
-    steamFormatted: getField(embed.fields, "Steam Formatado"),
-    steamName: getField(embed.fields, "Conta Steam"),
+    steamId: decrypt(getField(embed.fields, "Steam ID")),
+    steamFormatted: decrypt(getField(embed.fields, "Steam3 Hex")),
+    steamName: decrypt(getField(embed.fields, "Conta Steam")),
     characterName: getField(embed.fields, "Nome do personagem"),
     age: getField(embed.fields, "Idade"),
-    birthDate: getField(embed.fields, "Data de Nascimento"),
-    discord: getField(embed.fields, "Discord"),
+    birthDate: decrypt(getField(embed.fields, "Data de Nascimento")),
+    discord: decrypt(getField(embed.fields, "Discord")),
     rpExperience: getField(embed.fields, "Já jogou RP?"),
     characterStory: getField(embed.fields, "História do personagem"),
     timestamp: embed.timestamp || message.embeds[0]?.timestamp || "",
@@ -56,22 +91,7 @@ export async function fetchWhitelistMessages(): Promise<WhitelistRequest[]> {
     throw new Error("Discord bot não configurado");
   }
 
-  const res = await fetch(
-    `${DISCORD_API}/channels/${CHANNEL_ID}/messages?limit=100`,
-    { headers: getHeaders(), cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Erro ao buscar mensagens: ${res.status}`);
-  }
-
-  const messages: {
-    id: string;
-    embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
-    reactions?: { emoji: { name: string }; count: number }[];
-    content?: string;
-    attachments?: { filename: string; url: string }[];
-  }[] = await res.json();
+  const messages = await fetchAllMessages(CHANNEL_ID);
 
   const requests = messages
     .map(parseWhitelistEmbed)
@@ -115,23 +135,7 @@ export async function fetchWhitelistHistory(): Promise<WhitelistHistoryEntry[]> 
     throw new Error("Discord bot não configurado");
   }
 
-  const res = await fetch(
-    `${DISCORD_API}/channels/${CHANNEL_ID}/messages?limit=100`,
-    { headers: getHeaders(), cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Erro ao buscar mensagens: ${res.status}`);
-  }
-
-  const messages: {
-    id: string;
-    embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
-    reactions?: { emoji: { name: string }; count: number }[];
-    content?: string;
-    message_reference?: { message_id: string };
-    attachments?: { filename: string; url: string }[];
-  }[] = await res.json();
+  const messages = await fetchAllMessages(CHANNEL_ID);
 
   const history: WhitelistHistoryEntry[] = [];
 
@@ -192,29 +196,14 @@ export async function checkWhitelistStatus(steamId: string): Promise<WhitelistSt
     throw new Error("Discord bot não configurado");
   }
 
-  const res = await fetch(
-    `${DISCORD_API}/channels/${CHANNEL_ID}/messages?limit=100`,
-    { headers: getHeaders(), cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Erro ao buscar mensagens: ${res.status}`);
-  }
-
-  const messages: {
-    id: string;
-    embeds: { title?: string; fields?: { name: string; value: string }[]; timestamp?: string }[];
-    reactions?: { emoji: { name: string }; count: number }[];
-    content?: string;
-    message_reference?: { message_id: string };
-  }[] = await res.json();
+  const messages = await fetchAllMessages(CHANNEL_ID);
 
   for (const msg of messages) {
     if (!msg.embeds) continue;
     const embed = msg.embeds.find((e) => e.title === "Nova solicitação de Whitelist");
     if (!embed || !embed.fields) continue;
 
-    const msgSteamId = getField(embed.fields, "Steam ID");
+    const msgSteamId = decrypt(getField(embed.fields, "Steam ID"));
     if (msgSteamId !== steamId) continue;
 
     const hasApproved = msg.reactions?.some((r) => r.emoji.name === "✅");
@@ -474,23 +463,7 @@ export async function lookupRegistry(
     throw new Error("Bot ou canal de registro não configurado");
   }
 
-  const res = await fetch(
-    `${DISCORD_API}/channels/${REGISTRY_CHANNEL_ID}/messages?limit=100`,
-    { headers: getHeaders(), cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Erro ao buscar registro: ${res.status}`);
-  }
-
-  const messages: {
-    id: string;
-    embeds: {
-      title?: string;
-      fields?: { name: string; value: string }[];
-      timestamp?: string;
-    }[];
-  }[] = await res.json();
+  const messages = await fetchAllMessages(REGISTRY_CHANNEL_ID);
 
   const queryLower = query.toLowerCase();
 

@@ -126,7 +126,7 @@ export default function HeroSectionV2() {
               </p>
 
               <p className="font-rajdhani text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-[#FFD700] via-[#C9A227] to-[#8B6914] drop-shadow-[0_4px_30px_rgba(201,162,39,0.4)] mt-4 mb-4">
-                Atlas RP é esse lugar
+                Atlas RP é o seu lugar
               </p>
 
               <p className="font-rajdhani text-lg md:text-2xl text-white/90 leading-relaxed max-w-2xl">

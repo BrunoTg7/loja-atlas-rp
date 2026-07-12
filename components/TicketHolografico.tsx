@@ -114,14 +114,24 @@ const GlowRing = styled.div<{ $unlocked: boolean }>`
   animation: ${({ $unlocked }) => $unlocked ? "glowPulse 3s ease infinite" : "none"};
 `;
 
-export default function TicketHolografico({ unlocked = false }: { unlocked?: boolean }) {
+export default function TicketHolografico({
+  unlocked = false,
+  avatar = "",
+  name = "",
+  cityId = "",
+}: {
+  unlocked?: boolean;
+  avatar?: string;
+  name?: string;
+  cityId?: string;
+}) {
   const [displayId, setDisplayId] = useState<string[]>(["—", "—", "—", "—"]);
   const [rolling, setRolling] = useState(false);
 
   useEffect(() => {
-    if (unlocked) {
+    if (unlocked && cityId) {
       setRolling(true);
-      const target = "0000";
+      const target = cityId.padStart(4, "0").slice(0, 4);
       let step = 0;
       const interval = setInterval(() => {
         setDisplayId(
@@ -139,7 +149,7 @@ export default function TicketHolografico({ unlocked = false }: { unlocked?: boo
     } else {
       setDisplayId(["—", "—", "—", "—"]);
     }
-  }, [unlocked]);
+  }, [unlocked, cityId]);
 
   return (
     <TicketWrapper $unlocked={unlocked}>
@@ -216,10 +226,34 @@ export default function TicketHolografico({ unlocked = false }: { unlocked?: boo
         <g transform="translate(160, 260)" filter="url(#holoLight)">
           <circle r="40" fill="none" stroke="#d4af37" strokeWidth="1" strokeOpacity="0.3" />
           <circle r="30" fill="none" stroke="#d4af37" strokeWidth="0.5" strokeOpacity="0.2" />
-          <text y="22" textAnchor="middle" fontFamily="Rajdhani, sans-serif" fontSize="75" fontWeight="900" fill="#d4af37" fillOpacity="0.2">
-            A
-          </text>
+          {avatar ? (
+            <>
+              <clipPath id="avatarClip">
+                <circle r="28" />
+              </clipPath>
+              <image
+                href={avatar}
+                x="-28"
+                y="-28"
+                width="56"
+                height="56"
+                clipPath="url(#avatarClip)"
+                preserveAspectRatio="xMidYMid slice"
+              />
+            </>
+          ) : (
+            <text y="22" textAnchor="middle" fontFamily="Rajdhani, sans-serif" fontSize="75" fontWeight="900" fill="#d4af37" fillOpacity="0.2">
+              A
+            </text>
+          )}
         </g>
+
+        {/* Player name */}
+        {name && (
+          <text x="160" y="310" textAnchor="middle" fontFamily="Rajdhani, sans-serif" fontSize="12" fontWeight="700" fill="#d4af37" fillOpacity="0.8">
+            {name}
+          </text>
+        )}
 
         {/* Footer label */}
         <text x="160" y="370" textAnchor="middle" fontFamily="Rajdhani, sans-serif" fontSize="10" fill="rgba(255,255,255,0.25)" letterSpacing="2">

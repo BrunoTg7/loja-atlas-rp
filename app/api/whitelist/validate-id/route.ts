@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { fetchPlayer } from "@/lib/whitelistApi";
 
-const DISCORD_SUPPORT_URL = process.env.DISCORD_SUPPORT_URL || "https://discord.gg/e426pZyTCp";
+const DISCORD_SUPPORT_URL = process.env.DISCORD_SUPPORT_URL!;
 
 interface ValidatePayload {
   cityId: string;

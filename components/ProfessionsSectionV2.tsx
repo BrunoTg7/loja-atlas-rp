@@ -548,38 +548,33 @@ const FormButton = styled.button`
 `;
 
 function GoldenParticles() {
-  const [mounted, setMounted] = useState(false);
+  const [particles, setParticles] = useState<{ left: string; bg: string; yEnd: number; xEnd: number; duration: number }[]>([]);
 
   useEffect(() => {
-    setMounted(true);
+    setParticles(
+      Array.from({ length: 10 }).map((_, i) => ({
+        left: `${8 + Math.random() * 84}%`,
+        bg: i % 2 === 0
+          ? "rgba(245,166,35,0.45)"
+          : "rgba(255,200,87,0.4)",
+        yEnd: -window.innerHeight * 0.75 - Math.random() * 200,
+        xEnd: (Math.random() - 0.5) * 50,
+        duration: 7 + Math.random() * 4,
+      }))
+    );
   }, []);
 
-  if (!mounted) return null;
+  if (particles.length === 0) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
-      {Array.from({ length: 10 }).map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1.5 h-1.5 rounded-full"
-          style={{
-            left: `${8 + Math.random() * 84}%`,
-            bottom: "-3%",
-            background: i % 2 === 0
-              ? "rgba(245,166,35,0.45)"
-              : "rgba(255,200,87,0.4)",
-          }}
-          animate={{
-            y: [0, -window.innerHeight * 0.75 - Math.random() * 200],
-            opacity: [0, 0.6, 0],
-            x: [0, (Math.random() - 0.5) * 50],
-          }}
-          transition={{
-            duration: 7 + Math.random() * 4,
-            repeat: Infinity,
-            delay: i * 0.9,
-            ease: "easeOut",
-          }}
+          style={{ left: p.left, bottom: "-3%", background: p.bg }}
+          animate={{ y: [0, p.yEnd], opacity: [0, 0.6, 0], x: [0, p.xEnd] }}
+          transition={{ duration: p.duration, repeat: Infinity, delay: i * 0.9, ease: "easeOut" }}
         />
       ))}
     </div>

@@ -1,11 +1,11 @@
-const STEAM_RETURN_URL = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/steam/callback`;
+const STEAM_RETURN_URL = `${process.env.NEXT_PUBLIC_BASE_URL!}/api/auth/steam/callback`;
 
 export function getSteamLoginUrl(): string {
   const params = new URLSearchParams({
     "openid.ns": "http://specs.openid.net/auth/2.0",
     "openid.mode": "checkid_setup",
     "openid.return_to": STEAM_RETURN_URL,
-    "openid.realm": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+    "openid.realm": process.env.NEXT_PUBLIC_BASE_URL!,
     "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
     "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
   });
@@ -55,9 +55,5 @@ export async function getSteamProfile(steamId: string) {
 }
 
 export function formatSteamId(steamId64: string): string {
-  const universe = 1;
-  const accountId = BigInt(steamId64) - BigInt(76561197960265728);
-  const z = accountId & BigInt(1);
-  const w = accountId >> BigInt(2);
-  return `STEAM_${universe}:${z}:${w}`;
+  return "steam:" + BigInt(steamId64).toString(16);
 }

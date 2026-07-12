@@ -150,7 +150,7 @@ export async function rejectPlayer(
 }
 
 export function isStaffMember(steamId: string): boolean {
-  const staffIds = process.env.STAFF_STEAM_IDS || "";
+  const staffIds = process.env.STAFF_STEAM_IDS!;
   const ids = staffIds
     .split(",")
     .map((id) => id.trim())
