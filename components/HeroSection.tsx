@@ -174,7 +174,7 @@ export default function HeroSection() {
                   href="/atlas-coins"
                   className="group relative px-7 py-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-orbitron font-bold text-sm uppercase tracking-wider rounded-xl overflow-hidden transition-all duration-300 hover:bg-yellow-500/20 hover:border-yellow-500/40"
                 >
-                  <span className="relative z-10">ATLAS COINS</span>
+                  <span className="relative z-10">ATLAS</span>
                 </Link>
               </motion.div>
             </div>

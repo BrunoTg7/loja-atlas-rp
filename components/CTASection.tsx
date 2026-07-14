@@ -115,7 +115,7 @@ export default function CTASection() {
 
   return (
     <>
-      <section className="py-12 md:py-20 px-4 relative overflow-hidden"style={{
+      <section id="whitelist" className="py-12 md:py-20 px-4 relative overflow-hidden"style={{
         background: "linear-gradient(to bottom, #0B1A3B, #0D1225 30%, #111828 70%, #080C18)",
       }}>
         <div className="max-w-7xl mx-auto">

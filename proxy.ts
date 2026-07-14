@@ -1,5 +1,43 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function rateLimit(
+  key: string,
+  maxRequests: number,
+  windowMs: number
+): boolean {
+  const now = Date.now();
+  const entry = RATE_LIMIT.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    RATE_LIMIT.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+
+  if (entry.count >= maxRequests) return false;
+
+  entry.count++;
+  return true;
+}
+
+const PAYMENT_ROUTES: Record<string, { max: number; windowMs: number }> = {
+  "/api/checkout": { max: 5, windowMs: 60_000 },
+  "/api/webhook": { max: 30, windowMs: 60_000 },
+  "/api/fulfillment/confirm": { max: 20, windowMs: 60_000 },
+  "/api/cron/process-discord-queue": { max: 10, windowMs: 60_000 },
+  "/api/cron/expire-orders": { max: 10, windowMs: 60_000 },
+  "/api/cron/purge-logs": { max: 5, windowMs: 300_000 },
+};
+
 const BLOCKED_BOTS = [
   /curl/i,
   /wget/i,
@@ -66,6 +104,21 @@ export function proxy(request: NextRequest) {
       `[HONEYPOT] Blocked request from ${ip} | UA: ${ua} | Path: ${pathname}`
     );
     return new NextResponse(null, { status: 204 });
+  }
+
+  for (const [route, config] of Object.entries(PAYMENT_ROUTES)) {
+    if (pathname === route || pathname.startsWith(route + "/")) {
+      const ip = getClientIp(request);
+      const key = `${ip}:${route}`;
+
+      if (!rateLimit(key, config.max, config.windowMs)) {
+        return NextResponse.json(
+          { error: "Too many requests" },
+          { status: 429 }
+        );
+      }
+      break;
+    }
   }
 
   const response = NextResponse.next();

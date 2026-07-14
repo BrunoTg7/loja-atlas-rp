@@ -11,6 +11,7 @@
     "clean": "powershell -Command \"Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.2",
     "framer-motion": "^12.42.2",
     "jose": "^6.2.3",
     "next": "16.2.10",

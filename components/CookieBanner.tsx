@@ -48,10 +48,9 @@ export default function CookieBanner() {
               Privacidade e Cookies
             </h3>
             <p className="font-rajdhani text-white/60 text-sm leading-relaxed">
-              Utilizamos cookies apenas para manter sua sessão ativa e melhorar a navegação no site.
-              Ao continuar navegando, você concorda com nossa{" "}
-              <span className="text-[#d4af37]/80">Política de Privacidade</span> e{" "}
-              <span className="text-[#d4af37]/80">Termos de Uso</span>.
+              Utilizamos cookies de segurança essenciais para manter sua sessão ativa, autenticar seu acesso e garantir a integridade das suas transações financeiras. Ao continuar navegando e interagindo com nossa plataforma, você declara estar ciente e de acordo com nossos{" "}
+              <span className="text-[#d4af37]/80">Termos de Uso</span> e nossa{" "}
+              <span className="text-[#d4af37]/80">Política de Privacidade</span>.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface CartItem {
   id: string;
@@ -22,8 +22,38 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_KEY = "atlas_cart";
+
+function loadCart(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(items: CartItem[]) {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  } catch {}
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setItems(loadCart());
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      saveCart(items);
+    }
+  }, [items, loaded]);
 
   const addToCart = (item: CartItem) => {
     setItems((prev) => {

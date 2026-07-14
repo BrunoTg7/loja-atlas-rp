@@ -1,6 +1,9 @@
+import crypto from "crypto";
+
 const DISCORD_API = "https://discord.com/api/v10";
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const CHANNEL_ID = process.env.DISCORD_WL_CHANNEL_ID;
+const DELIVERY_WEBHOOK_URL = process.env.DISCORD_DELIVERY_WEBHOOK_URL;
 
 import { decrypt } from "@/lib/crypto";
 
@@ -496,4 +499,148 @@ export async function lookupRegistry(
       };
     })
     .filter((entry): entry is RegistryEntry => entry !== null);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FULFILLMENT — Payload assinado para entrega via Discord
+   ═══════════════════════════════════════════════════════════════ */
+
+interface FulfillmentItem {
+  productId: string;
+  name: string;
+  amount: number;
+  priceCents: number;
+  type: string;
+}
+
+interface FulfillmentParams {
+  orderId: string;
+  charId: string;
+  steamId: string;
+  steamHex: string;
+  totalCents: number;
+  currency: string;
+  termsAccepted: boolean;
+  termsVersion: string;
+  items: FulfillmentItem[];
+  callbackUrl: string;
+}
+
+export function buildFulfillmentPayload(params: FulfillmentParams) {
+  return {
+    event: "order_approved",
+    order_id: params.orderId,
+    char_id: params.charId,
+    steam_id: params.steamId,
+    steam_hex: params.steamHex,
+    total_cents: params.totalCents,
+    currency: params.currency,
+    paid_at: new Date().toISOString(),
+    compliance: {
+      terms_accepted: params.termsAccepted,
+      terms_version: params.termsVersion,
+      policy_summary:
+        "Direito de arrependimento de 7 dias válido estritamente para moedas digitais não consumidas.",
+    },
+    items: params.items.map((item) => ({
+      product_id: item.productId,
+      name: item.name,
+      amount: item.amount,
+      price_cents: item.priceCents,
+      type: item.type,
+    })),
+    callback_url: params.callbackUrl,
+  };
+}
+
+export function signPayload(payload: object) {
+  const secret = process.env.FULFILLMENT_CALLBACK_SECRET;
+  if (!secret) {
+    throw new Error("FULFILLMENT_CALLBACK_SECRET não configurado");
+  }
+
+  const body = JSON.stringify(payload);
+  const signature = crypto
+    .createHmac("sha256", secret)
+    .update(body)
+    .digest("hex");
+
+  return { body, signature };
+}
+
+export function verifyPayloadSignature(
+  payload: object,
+  receivedSignature: string
+): boolean {
+  const secret = process.env.FULFILLMENT_CALLBACK_SECRET;
+  if (!secret) return false;
+
+  const body = JSON.stringify(payload);
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(body)
+    .digest("hex");
+
+  const sigClean = receivedSignature.replace("sha256=", "");
+  const a = Buffer.from(sigClean, "hex");
+  const b = Buffer.from(expected, "hex");
+
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+export async function sendSignedToDiscord(payload: object): Promise<void> {
+  if (!DELIVERY_WEBHOOK_URL) {
+    throw new Error("DISCORD_DELIVERY_WEBHOOK_URL não configurado");
+  }
+
+  const { signature } = signPayload(payload);
+  const signedPayload = { ...payload, signature };
+
+  const res = await fetch(DELIVERY_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content: `||FULFILLMENT_PAYLOAD:${JSON.stringify(signedPayload)}||`,
+      embeds: [
+        {
+          title: "Pagamento Aprovado — Entrega Solicitada",
+          color: 0x22c55e,
+          timestamp: new Date().toISOString(),
+          fields: [
+            {
+              name: "Order ID",
+              value: `\`${(payload as any).order_id}\``,
+              inline: true,
+            },
+            {
+              name: "ID Personagem",
+              value: `\`${(payload as any).char_id}\``,
+              inline: true,
+            },
+            {
+              name: "Steam HEX",
+              value: `\`${(payload as any).steam_hex}\``,
+              inline: false,
+            },
+            {
+              name: "Valor",
+              value: `R$ ${((payload as any).total_cents / 100).toFixed(2)}`,
+              inline: true,
+            },
+            {
+              name: "Produtos",
+              value: (payload as any).items
+                .map((i: any) => `- ${i.amount}x **${i.name}**`)
+                .join("\n"),
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Discord respondeu com status: ${res.status}`);
+  }
 }

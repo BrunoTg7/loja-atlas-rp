@@ -14,9 +14,26 @@ function MobileMenu({ open, onClose, user, isAdmin }: { open: boolean; onClose: 
       <div className="absolute top-[60px] left-0 right-0 bg-[#0B1A3B]/98 border-b border-[#F5A623]/30 p-6 shadow-xl">
         <nav className="flex flex-col gap-4">
           <Link href="/" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Início</Link>
-          <Link href="/atlas-coins" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas Coins</Link>
+          <Link href="/eventos" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Eventos</Link>
+          <Link href="/historia" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">História</Link>
+          <Link href="/sobre" onClick={onClose} className="font-rajdhani text-base text-gray-400 hover:text-white transition-colors uppercase tracking-wider">Sobre</Link>
+          <button onClick={() => {
+            onClose();
+            if (window.location.pathname === "/") {
+              setTimeout(() => document.getElementById("whitelist")?.scrollIntoView({ behavior: "smooth" }), 100);
+            } else {
+              window.location.href = "/#whitelist";
+            }
+          }} className="font-rajdhani text-base text-[#FF2E44] hover:text-[#FF6B7A] transition-colors uppercase tracking-wider text-left">Whitelist</button>
           {isAdmin && (
-            <Link href="/admin/whitelist" onClick={onClose} className="font-rajdhani text-base text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">Admin</Link>
+            <Link href="/atlas-coins" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas</Link>
+          )}
+          {isAdmin && (
+            <>
+              <Link href="/admin/whitelist" onClick={onClose} className="font-rajdhani text-base text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">Admin - Whitelist</Link>
+              <Link href="/admin/promocoes" onClick={onClose} className="font-rajdhani text-base text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">Admin - Promoções</Link>
+              <Link href="/admin/eventos" onClick={onClose} className="font-rajdhani text-base text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">Admin - Eventos</Link>
+            </>
           )}
         </nav>
         <div className="mt-4 pt-4 border-t border-white/10">
@@ -97,38 +114,83 @@ export default function Header() {
             Início
           </Link>
           <Link
-            href="/atlas-coins"
-            className="font-rajdhani text-sm lg:text-base text-yellow-500 hover:text-yellow-400 transition-colors duration-300 uppercase tracking-wider"
+            href="/eventos"
+            className="font-rajdhani text-sm lg:text-base text-gray-400 hover:text-white transition-colors duration-300 uppercase tracking-wider"
           >
-            Atlas Coins
+            Eventos
           </Link>
+          <Link
+            href="/historia"
+            className="font-rajdhani text-sm lg:text-base text-gray-400 hover:text-white transition-colors duration-300 uppercase tracking-wider"
+          >
+            História
+          </Link>
+          <Link
+            href="/sobre"
+            className="font-rajdhani text-sm lg:text-base text-gray-400 hover:text-white transition-colors duration-300 uppercase tracking-wider"
+          >
+            Sobre
+          </Link>
+          <button
+            onClick={() => {
+              if (window.location.pathname === "/") {
+                document.getElementById("whitelist")?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                window.location.href = "/#whitelist";
+              }
+            }}
+            className="font-rajdhani text-sm lg:text-base text-[#FF2E44] hover:text-[#FF6B7A] transition-colors duration-300 uppercase tracking-wider"
+          >
+            Whitelist
+          </button>
           {isAdmin && (
             <Link
-              href="/admin/whitelist"
-              className="font-rajdhani text-sm lg:text-base text-indigo-400 hover:text-indigo-300 transition-colors duration-300 uppercase tracking-wider"
+              href="/atlas-coins"
+              className="font-rajdhani text-sm lg:text-base text-yellow-500 hover:text-yellow-400 transition-colors duration-300 uppercase tracking-wider"
             >
-              Admin
+              Atlas
             </Link>
+          )}
+          {isAdmin && (
+            <div className="relative group">
+              <button className="font-rajdhani text-sm lg:text-base text-indigo-400 hover:text-indigo-300 transition-colors duration-300 uppercase tracking-wider flex items-center gap-1">
+                Admin
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              <div className="absolute top-full left-0 mt-1 bg-[#0B1A3B]/98 border border-[#F5A623]/20 rounded-xl shadow-xl py-2 min-w-[180px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <Link href="/admin/whitelist" className="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-rajdhani uppercase tracking-wider">
+                  Whitelist
+                </Link>
+                <Link href="/admin/promocoes" className="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-rajdhani uppercase tracking-wider">
+                  Promoções
+                </Link>
+                <Link href="/admin/eventos" className="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-rajdhani uppercase tracking-wider">
+                  Eventos
+                </Link>
+              </div>
+            </div>
           )}
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Cart button */}
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative p-2 md:p-2.5 text-gray-400 hover:text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/10 rounded-xl transition-all duration-300"
-            title="Carrinho"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-            </svg>
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#d4af37] text-[#0a0a0a] text-[10px] font-black flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </button>
+          {/* Cart button - only for admins */}
+          {isAdmin && (
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 md:p-2.5 text-gray-400 hover:text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/10 rounded-xl transition-all duration-300"
+              title="Carrinho"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#d4af37] text-[#0a0a0a] text-[10px] font-black flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Hamburger - Mobile */}
           <button
