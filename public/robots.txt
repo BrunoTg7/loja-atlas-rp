@@ -36,4 +36,4 @@ Disallow: /
 User-agent: Meta-ExternalAgent
 Disallow: /
 
-Sitemap: https://loja-atlas-rp.vercel.app/sitemap.xml
+Sitemap: https://loja-atlas-rp.vercel.app/api/sitemap
