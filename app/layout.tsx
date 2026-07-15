@@ -13,6 +13,9 @@ import { anton, cinzel, orbitron, rajdhani } from "./fonts";
 export const metadata: Metadata = {
   title: "Atlas RP - Loja Oficial",
   description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
+  verification: {
+    google: "1HEMZIn_wJ8Q0rbpOylZiRbhjQPq59J0hSLz_k6s-8Q",
+  },
   icons: {
     icon: "/Imagens/logo-atlas-rp.webp",
   },
