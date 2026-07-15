@@ -1,14 +1,6 @@
 {
   "crons": [
     {
-      "path": "/api/cron/process-discord-queue",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/expire-orders",
-      "schedule": "0 0 * * *"
-    },
-    {
       "path": "/api/cron/purge-logs",
       "schedule": "0 3 * * *"
     }

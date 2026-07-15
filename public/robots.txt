@@ -1,5 +1,5 @@
 User-agent: *
-Disallow: /
+Allow: /
 Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
@@ -36,4 +36,4 @@ Disallow: /
 User-agent: Meta-ExternalAgent
 Disallow: /
 
-Sitemap: https://loja.atlasrp.com.br/sitemap.xml
+Sitemap: https://loja-atlas-rp.vercel.app/sitemap.xml
