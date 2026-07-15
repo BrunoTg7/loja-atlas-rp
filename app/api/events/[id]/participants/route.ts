@@ -41,6 +41,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getSession();
+    if (!session?.steamId) {
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { participant_name, participant_data } = body;
@@ -69,10 +74,22 @@ export async function POST(
       return NextResponse.json({ error: "Este evento já encerrou" }, { status: 400 });
     }
 
+    const { data: existing } = await supabase
+      .from("event_participants")
+      .select("id")
+      .eq("event_id", id)
+      .eq("steam_id", session.steamId)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({ error: "Você já está inscrito neste evento" }, { status: 409 });
+    }
+
     const { data, error } = await supabase
       .from("event_participants")
       .insert({
         event_id: id,
+        steam_id: session.steamId,
         participant_name,
         participant_data: participant_data || {},
       })

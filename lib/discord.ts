@@ -121,7 +121,7 @@ export async function fetchWhitelistMessages(): Promise<WhitelistRequest[]> {
           const storyStart = text.indexOf("\n\n");
           req.characterStory = storyStart !== -1 ? text.slice(storyStart + 2) : text;
         }
-      } catch {}
+      } catch { }
     }
   }
 
@@ -180,7 +180,7 @@ export async function fetchWhitelistHistory(): Promise<WhitelistHistoryEntry[]> 
           const storyStart = text.indexOf("\n\n");
           entry.characterStory = storyStart !== -1 ? text.slice(storyStart + 2) : text;
         }
-      } catch {}
+      } catch { }
     }
   }
 
@@ -587,6 +587,54 @@ export function verifyPayloadSignature(
 
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
+}
+
+const NOTIFICATION_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_NOTIFICACAO;
+const NOTIFICATION_USER_IDS = process.env.DISCORD_ID_USER_NOTIFICACAO;
+
+export async function sendWhitelistNotification(
+  characterName: string,
+  cityId: string,
+  discord: string,
+  steamName: string
+): Promise<void> {
+  if (!NOTIFICATION_WEBHOOK_URL || !NOTIFICATION_USER_IDS) return;
+
+  const ROLE_ID = NOTIFICATION_USER_IDS;
+
+  const embed = {
+    title: "📋 Nova Whitelist Enviada",
+    color: 0x6366f1,
+    url: "https://loja-atlas-rp.vercel.app/admin/whitelist",
+    fields: [
+      { name: "Personagem", value: characterName, inline: true },
+      { name: "ID Cidade", value: cityId, inline: true },
+      { name: "Discord", value: `<@${discord}>`, inline: true },
+    ],
+    timestamp: new Date().toISOString(),
+    footer: { text: "Atlas RP • Notificação Automática" },
+  };
+
+  try {
+    const res = await fetch(NOTIFICATION_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `<@&${ROLE_ID}>`,
+        embeds: [embed],
+        allowed_mentions: { roles: [ROLE_ID] },
+        username: "Atlas RP Whitelist",
+        avatar_url: "https://cdn.discordapp.com/attachments/1523811762502238318/1524518600248004750/logo-atlas-rp.png?ex=6a589bd6&is=6a574a56&hm=205fb4676780ca2f6df5bc7fb5d8e52a5f333ec913aed505df787a35399bd380&",
+      }),
+    });
+    if (!res.ok) {
+      console.error(`[NOTIFICATION] Erro ao enviar webhook: ${res.status}`);
+    } else {
+      console.log(`[NOTIFICATION] Webhook enviada com sucesso`);
+    }
+  } catch (err) {
+    console.error(`[NOTIFICATION] Erro ao enviar webhook:`, err);
+  }
 }
 
 export async function sendSignedToDiscord(payload: object): Promise<void> {

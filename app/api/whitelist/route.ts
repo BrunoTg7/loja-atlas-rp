@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { sanitizeInput, hasSuspiciousContent } from "@/lib/sanitize";
-import { checkWhitelistStatus } from "@/lib/discord";
+import { checkWhitelistStatus, sendWhitelistNotification } from "@/lib/discord";
 import { encrypt } from "@/lib/crypto";
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
@@ -191,6 +191,9 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`[WHITELIST] Success | Steam: ${session.steamId} | Story length: ${cleanCharacterStory.length}`);
+
+    sendWhitelistNotification(cleanCharacterName, cleanCityId, cleanDiscord, session.personaName).catch(() => {});
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[WHITELIST] Erro ao enviar webhook:", err);

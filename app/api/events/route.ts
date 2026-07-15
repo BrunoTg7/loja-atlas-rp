@@ -3,16 +3,37 @@ import { getSupabaseServer } from "@/lib/supabase-server";
 import { getSession } from "@/lib/session";
 import { isStaffMember } from "@/lib/whitelistApi";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabaseServer();
-    const now = new Date().toISOString();
+    const all = request.nextUrl.searchParams.get("all");
+
+    if (all) {
+      const session = await getSession();
+      if (!session?.steamId || !isStaffMember(session.steamId)) {
+        return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+      }
+
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .order("start_date", { ascending: false });
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ events: data || [] });
+    }
+
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
       .from("events")
       .select("*")
       .eq("is_enabled", true)
-      .gte("end_date", now)
+      .gte("end_date", cutoff)
       .order("start_date", { ascending: true });
 
     if (error) {
