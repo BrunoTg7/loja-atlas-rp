@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   title: "Atlas RP - Loja Oficial",
   description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
   applicationName: "Atlas RP",
+  authors: [{ name: "Atlas RP" }],
+  creator: "Atlas RP",
+  publisher: "Atlas RP",
+  alternates: {
+    canonical: SITE_URL,
+  },
   verification: {
     google: "1HEMZIn_wJ8Q0rbpOylZiRbhjQPq59J0hSLz_k6s-8Q",
   },
