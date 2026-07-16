@@ -92,7 +92,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!loadingSession && user && isAdmin && items.length === 0) {
-      router.push("/atlas-coins");
+      router.push("/atlas");
     }
   }, [user, loadingSession, isAdmin, items, router]);
 
@@ -283,7 +283,7 @@ export default function CheckoutPage() {
                 Pagamento <span className="text-emerald-400">Aprovado!</span>
               </h1>
               <p className="text-white/50 text-sm mb-8">Seu cartão foi cobrado com sucesso.</p>
-              <Link href="/atlas-coins" className="w-full h-11 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e8c84a] to-[#d4af37] text-[#0a0a0a] text-sm font-bold uppercase tracking-wider font-orbitron flex items-center justify-center">
+              <Link href="/atlas" className="w-full h-11 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e8c84a] to-[#d4af37] text-[#0a0a0a] text-sm font-bold uppercase tracking-wider font-orbitron flex items-center justify-center">
                 Voltar para a Loja
               </Link>
             </div>
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
                   </h2>
                   <p className="text-white/50 text-sm mb-8">Suas moedas serão entregues em breve.</p>
                   <button
-                    onClick={() => { clearCart(); router.push("/atlas-coins"); }}
+                    onClick={() => { clearCart(); router.push("/atlas"); }}
                     className="w-full h-11 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e8c84a] to-[#d4af37] text-[#0a0a0a] text-sm font-bold uppercase tracking-wider font-orbitron"
                   >
                     Voltar para a Loja

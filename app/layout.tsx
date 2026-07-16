@@ -8,11 +8,16 @@ import { SteamProvider } from "@/context/SteamContext";
 import { CartProvider } from "@/context/CartContext";
 import { MarketingProvider } from "@/context/MarketingContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
+import DevToolsProtection from "@/components/DevToolsProtection";
 import { anton, cinzel, orbitron, rajdhani } from "./fonts";
 
+const SITE_URL = "https://loja-atlas-rp.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Atlas RP - Loja Oficial",
   description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
+  applicationName: "Atlas RP",
   verification: {
     google: "1HEMZIn_wJ8Q0rbpOylZiRbhjQPq59J0hSLz_k6s-8Q",
   },
@@ -22,23 +27,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Atlas RP - Loja Oficial",
     description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
+    siteName: "Atlas RP",
+    locale: "pt_BR",
+    type: "website",
+    url: SITE_URL,
     images: [
       {
-        url: "/Imagens/logo-atlas-rp.webp",
+        url: `${SITE_URL}/Imagens/logo-atlas-rp.webp`,
         width: 512,
         height: 512,
         alt: "Atlas RP Logo",
       },
     ],
-    siteName: "Atlas RP",
-    locale: "pt_BR",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Atlas RP - Loja Oficial",
     description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
-    images: ["/Imagens/logo-atlas-rp.webp"],
+    images: [`${SITE_URL}/Imagens/logo-atlas-rp.webp`],
   },
 };
 
@@ -50,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${cinzel.variable} ${orbitron.variable} ${rajdhani.variable}`}>
       <body className="min-h-full flex flex-col">
+        <DevToolsProtection />
         <a
           href="/api/internal/trap"
           aria-hidden="true"

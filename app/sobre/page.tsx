@@ -185,7 +185,7 @@ export default function SobrePage() {
                 <h3 className="font-cinzel text-lg font-bold text-white mb-4">Canais Diretos</h3>
 
                 <a
-                  href="https://discord.gg/"
+                  href="https://discord.gg/e426pZyTCp"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-[#5865F2]/40 hover:bg-[#5865F2]/5 transition-all group mb-3"

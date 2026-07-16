@@ -890,7 +890,7 @@ export default function ProfessionsSection() {
               </DocumentBody>
               <DocumentFooter>
                 <DottedLine $faction="mechanic" />
-                <ActionButton $faction="mechanic" href="/vips">
+                <ActionButton $faction="mechanic" href="/atlas">
                   Trabalhar na Oficina
                 </ActionButton>
               </DocumentFooter>
@@ -993,7 +993,7 @@ export default function ProfessionsSection() {
               </DocumentBody>
               <DocumentFooter>
                 <DottedLine $faction="hospital" />
-                <ActionButton $faction="hospital" href="/vips">
+                <ActionButton $faction="hospital" href="/atlas">
                   Entrar para a Medicina
                 </ActionButton>
               </DocumentFooter>

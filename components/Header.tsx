@@ -26,7 +26,7 @@ function MobileMenu({ open, onClose, user, isAdmin }: { open: boolean; onClose: 
             }
           }} className="font-rajdhani text-base text-[#FF2E44] hover:text-[#FF6B7A] transition-colors uppercase tracking-wider text-left">Whitelist</button>
           {isAdmin && (
-            <Link href="/atlas-coins" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas</Link>
+            <Link href="/atlas" onClick={onClose} className="font-rajdhani text-base text-yellow-500 hover:text-yellow-400 transition-colors uppercase tracking-wider">Atlas</Link>
           )}
           {isAdmin && (
             <>
@@ -145,7 +145,7 @@ export default function Header() {
           </button>
           {isAdmin && (
             <Link
-              href="/atlas-coins"
+              href="/atlas"
               className="font-rajdhani text-sm lg:text-base text-yellow-500 hover:text-yellow-400 transition-colors duration-300 uppercase tracking-wider"
             >
               Atlas

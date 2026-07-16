@@ -742,7 +742,7 @@ export default function ConfrontationSection() {
               </DocumentBody>
               <DocumentFooter>
                 <DottedLine $faction="police" />
-                <ActionButton $faction="police" href="/vips">
+                <ActionButton $faction="police" href="/atlas">
                   Assinar meu Alistamento
                 </ActionButton>
               </DocumentFooter>
@@ -788,7 +788,7 @@ export default function ConfrontationSection() {
               </DocumentBody>
               <DocumentFooter>
                 <DottedLine $faction="criminal" />
-                <ActionButton $faction="criminal" href="/vips">
+                <ActionButton $faction="criminal" href="/atlas">
                   Assinar minha Entrada
                 </ActionButton>
               </DocumentFooter>

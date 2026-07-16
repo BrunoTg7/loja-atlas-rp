@@ -35,7 +35,7 @@ export default function CheckoutFalhaPage() {
                 Tentar Novamente
               </Link>
               <Link
-                href="/atlas-coins"
+                href="/atlas"
                 className="w-full h-11 rounded-xl border border-white/10 hover:border-[#d4af37]/30 text-white/50 hover:text-white text-sm font-medium transition-colors flex items-center justify-center"
               >
                 Voltar para a Loja

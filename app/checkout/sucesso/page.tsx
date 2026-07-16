@@ -44,7 +44,7 @@ function SuccessContent() {
 
             <div className="flex flex-col gap-3">
               <Link
-                href="/atlas-coins"
+                href="/atlas"
                 className="w-full h-11 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e8c84a] to-[#d4af37] hover:from-[#e8c84a] hover:to-[#e8c84a] text-[#0a0a0a] text-sm font-bold uppercase tracking-wider transition-all duration-300 font-orbitron flex items-center justify-center"
               >
                 Voltar para a Loja
