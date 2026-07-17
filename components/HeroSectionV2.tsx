@@ -35,7 +35,8 @@ export default function HeroSectionV2() {
         className="sticky top-[54px] md:top-[64px] h-[calc(100vh-54px)] md:h-[calc(100vh-64px)] w-full overflow-hidden"
         style={{ opacity: heroOpacity }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F121B] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 50% 30%, rgba(212,175,55,0.25) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(15,18,27,0.8) 0%, transparent 50%)` }} />
 
         <motion.div
           className="absolute inset-0"

@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import TicketHolografico from "./TicketHolografico";
 import WhitelistModal from "./WhitelistModal";
+import BaseModal from "@/components/BaseModal";
 import { useSteam } from "@/context/SteamContext";
 
 const FadeIn = styled.div<{ $visible: boolean }>`
@@ -255,35 +256,31 @@ export default function CTASection() {
 
       <WhitelistModal open={whitelistOpen} onClose={() => setWhitelistOpen(false)} />
 
-      {fiveMOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#0d0b09] border border-[#d4af37]/20 rounded-2xl p-8 max-w-md mx-4 text-center">
-            <h3 className=" text-xl font-bold text-white mb-4">
-              Conectar ao Servidor
-            </h3>
-            <p className="font-rajdhani text-white/60 mb-2">
-              Certifique-se de que o <span className="text-[#d4af37] font-bold">FiveM</span> está aberto no seu computador.
-            </p>
-            <p className="font-rajdhani text-white/40 text-sm mb-6">
-              Se o FiveM não estiver rodando, abra o aplicativo primeiro e tente novamente.
-            </p>
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleConnect}
-                className="px-6 py-3 bg-gradient-to-r from-[#d4af37] to-[#b8941f] rounded-lg  text-sm font-bold text-[#0d0b09] uppercase tracking-wider cursor-pointer transition-all hover:shadow-[0_6px_30px_rgba(212,175,55,0.45)]"
-              >
-                Tentar Conectar Novamente
-              </button>
-              <button
-                onClick={() => setFiveMOpen(false)}
-                className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-rajdhani text-sm text-white/60 cursor-pointer transition-all hover:bg-white/10 hover:text-white"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BaseModal
+        open={fiveMOpen}
+        onClose={() => setFiveMOpen(false)}
+        title="Conectar ao Servidor"
+        maxWidth="md"
+        closeOnBackdrop={false}
+        icon={
+          <svg className="w-5 h-5 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+          </svg>
+        }
+        footer={
+          <>
+            <BaseModal.SecondaryButton onClick={() => setFiveMOpen(false)}>Fechar</BaseModal.SecondaryButton>
+            <BaseModal.PrimaryButton onClick={handleConnect}>Tentar Conectar Novamente</BaseModal.PrimaryButton>
+          </>
+        }
+      >
+        <p className="font-rajdhani text-white/60 mb-2">
+          Certifique-se de que o <span className="text-[#d4af37] font-bold">FiveM</span> está aberto no seu computador.
+        </p>
+        <p className="font-rajdhani text-white/40 text-sm">
+          Se o FiveM não estiver rodando, abra o aplicativo primeiro e tente novamente.
+        </p>
+      </BaseModal>
     </>
   );
 }

@@ -9,9 +9,10 @@ function SuccessContent() {
   const orderId = searchParams.get("order");
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen bg-gradient-to-br from-[#05080F] via-[#0B1725] to-[#05080F]">
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b] via-[#0c0c10] to-[#09090b]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 30% 20%, rgba(212,175,55,0.25) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(212,175,55,0.15) 0%, transparent 50%)` }} />
       </div>
 
       <div className="relative z-10 pt-24 pb-16 px-4">
@@ -68,7 +69,7 @@ function SuccessContent() {
 export default function CheckoutSucessoPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#05080F] via-[#0B1725] to-[#05080F]">
         <div className="text-white/40 text-sm">Carregando...</div>
       </div>
     }>

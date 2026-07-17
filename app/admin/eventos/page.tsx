@@ -353,14 +353,14 @@ export default function AdminEventosPage() {
 
   if (steamLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0F121B] to-[#05080F]">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]">
         <div className="h-8 w-8 rounded-full border-2 border-[#d4af37]/30 border-t-[#d4af37] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F121B] via-[#0B1725] to-[#05080F] pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F] pt-24 pb-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

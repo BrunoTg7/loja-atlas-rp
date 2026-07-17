@@ -692,3 +692,61 @@ export async function sendSignedToDiscord(payload: object): Promise<void> {
     throw new Error(`Discord respondeu com status: ${res.status}`);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DISCORD OAUTH2 — Login com Discord
+   ═══════════════════════════════════════════════════════════════ */
+
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID!;
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET!;
+const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI!;
+
+export function getDiscordLoginUrl(state: string): string {
+  const params = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID,
+    redirect_uri: DISCORD_REDIRECT_URI,
+    response_type: "code",
+    scope: "identify",
+    state,
+  });
+  return `https://discord.com/api/oauth2/authorize?${params.toString()}`;
+}
+
+export async function exchangeDiscordCode(code: string): Promise<string> {
+  const res = await fetch(`${DISCORD_API}/oauth2/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: DISCORD_CLIENT_ID,
+      client_secret: DISCORD_CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: DISCORD_REDIRECT_URI,
+    }),
+  });
+
+  if (!res.ok) throw new Error("Failed to exchange Discord code");
+  const data = await res.json();
+  return data.access_token;
+}
+
+export interface DiscordUser {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  global_name: string | null;
+}
+
+export async function getDiscordUser(accessToken: string): Promise<DiscordUser> {
+  const res = await fetch(`${DISCORD_API}/users/@me`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch Discord user");
+  return res.json();
+}
+
+export function getDiscordAvatarUrl(userId: string, avatar: string, size = 128): string {
+  return `https://cdn.discordapp.com/avatars/${userId}/${avatar}.png?size=${size}`;
+}

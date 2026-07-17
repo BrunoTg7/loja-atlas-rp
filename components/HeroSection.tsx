@@ -59,7 +59,8 @@ export default function HeroSection() {
         style={{ opacity: heroOpacity }}
       >
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F121B] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 50% 30%, rgba(212,175,55,0.25) 0%, transparent 50%)` }} />
 
         {/* Image 1: Background - Horizontal Wipe Reveal */}
         <motion.div

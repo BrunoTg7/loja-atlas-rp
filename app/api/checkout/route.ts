@@ -23,6 +23,10 @@ interface CardData {
 
 interface CheckoutBody {
   char_id: string;
+  discord_id?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
   terms_accepted: boolean;
   payment_method: "pix" | "credit_card";
   installments?: number;
@@ -54,11 +58,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body: CheckoutBody = await req.json();
-    const { char_id, terms_accepted, payment_method, installments, card_data, items, promo_code } = body;
+    const { char_id, discord_id, contact_name, contact_email, contact_phone, terms_accepted, payment_method, installments, card_data, items, promo_code } = body;
 
     if (!terms_accepted) {
       return NextResponse.json(
-        { error: "Você precisa aceitar os Termos de Uso e Política de Reembolso." },
+        { error: "Você precisa aceitar os Termos de Uso e Política de Privacidade." },
         { status: 400 }
       );
     }
@@ -228,14 +232,18 @@ export async function POST(req: NextRequest) {
       p_char_id: cleanCharId,
       p_total_cents: totalCents,
       p_currency: "BRL",
-      p_customer_name: session.personaName,
-      p_customer_email: null,
+      p_customer_name: contact_name?.trim() || session.personaName,
+      p_customer_email: contact_email?.trim() || null,
       p_terms_accepted: terms_accepted,
       p_terms_version: termsVersion,
       p_customer_ip: customerIp,
       p_items: itemsJson,
       p_payment_id: paymentId,
       p_gateway: process.env.GATEWAY_PROVIDER || "mock",
+      p_discord_id: discord_id || null,
+      p_contact_name: contact_name?.trim() || null,
+      p_contact_email: contact_email?.trim() || null,
+      p_contact_phone: contact_phone?.trim() || null,
     });
 
     if (error) {

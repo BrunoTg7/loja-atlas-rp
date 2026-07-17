@@ -224,9 +224,10 @@ export default function AdminPromocoesPage() {
   const productsWithPromo = productPromos.filter((p) => p.active);
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen bg-gradient-to-br from-[#05080F] via-[#0B1725] to-[#05080F]">
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b] via-[#0c0c10] to-[#09090b]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 30% 20%, rgba(212,175,55,0.25) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(212,175,55,0.15) 0%, transparent 50%)` }} />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-10">
@@ -581,9 +582,12 @@ export default function AdminPromocoesPage() {
                 {promoFormProductId === "ALL" && promoFormValue && (
                   <div className="mt-4 p-3 bg-[#121622] rounded-lg border border-white/10">
                     <span className="text-[#d4af37] text-xs font-semibold">
-                      Promoção de {promoFormType === "percentage" ? `${promoFormValue}%` : `R$ ${Number(promoFormValue).toFixed(2).replace(".", ",")}`} aplicada a todos os produtos
+                      {promoFormPaymentMethod === "pix"
+                        ? `${promoFormValue}% a mais no PIX`
+                        : `Promoção de ${promoFormType === "percentage" ? `${promoFormValue}%` : `R$ ${Number(promoFormValue).toFixed(2).replace(".", ",")}`}`}
+                      {' '}aplicada a todos os produtos
                       {promoFormMinOrder && ` (mínimo R$ ${Number(promoFormMinOrder).toFixed(2).replace(".", ",")})`}
-                      {promoFormPaymentMethod && ` — apenas ${promoFormPaymentMethod === "pix" ? "PIX" : "Cartão"}`}
+                      {promoFormPaymentMethod && promoFormPaymentMethod !== "pix" && ` — apenas ${promoFormPaymentMethod === "credit_card" ? "Cartão" : "PIX"}`}
                     </span>
                   </div>
                 )}
@@ -611,7 +615,9 @@ export default function AdminPromocoesPage() {
                     <div key={promo.id} className="bg-[#121622] border border-[#d4af37]/30 rounded-xl p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <span className="text-[#d4af37] font-orbitron font-bold text-sm">
-                          -{formatDiscount(promo.discount_type, promo.discount_value)}
+                          {promo.payment_methods === "pix" && promo.discount_type === "percentage"
+                            ? `${promo.discount_value}% a mais`
+                            : `-${formatDiscount(promo.discount_type, promo.discount_value)}`}
                         </span>
                         <span className="text-white/60 text-xs">
                           Todos os produtos
@@ -677,7 +683,9 @@ export default function AdminPromocoesPage() {
                             R$ {getDiscountedPrice(product.id, promo).toFixed(2).replace(".", ",")}
                           </span>
                           <span className="text-[#d4af37] text-xs font-semibold">
-                            -{formatDiscount(promo.discount_type, promo.discount_value)}
+                            {promo.payment_methods === "pix" && promo.discount_type === "percentage"
+                              ? `${promo.discount_value}% a mais`
+                              : `-${formatDiscount(promo.discount_type, promo.discount_value)}`}
                           </span>
                         </>
                       ) : (
@@ -691,7 +699,7 @@ export default function AdminPromocoesPage() {
                       <p className="text-emerald-400/60 text-[10px] mt-1">
                         {allPromoQualifies
                           ? "Promoção ALL ativa"
-                          : `ALL: -${formatDiscount(allPromo.discount_type, allPromo.discount_value)} acima de R$ ${(allPromo.min_order_cents / 100).toFixed(2).replace(".", ",")}${allPromo.payment_methods ? ` • ${allPromo.payment_methods === "pix" ? "PIX" : "Cartão"}` : ""}`
+                          : `${allPromo.payment_methods === "pix" && allPromo.discount_type === "percentage" ? `${allPromo.discount_value}% a mais` : `-${formatDiscount(allPromo.discount_type, allPromo.discount_value)}`} acima de R$ ${(allPromo.min_order_cents / 100).toFixed(2).replace(".", ",")}${allPromo.payment_methods ? ` • ${allPromo.payment_methods === "pix" ? "PIX" : "Cartão"}` : ""}`
                         }
                       </p>
                     )}

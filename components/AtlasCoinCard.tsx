@@ -29,10 +29,10 @@ interface AllPromoInfo {
 }
 
 const featuredPackages: CoinPackage[] = [
-  { id: "c5000", amount: 5000, price: 199.90, tier: "featured", buttonColor: "from-purple-600 via-purple-500 to-purple-700" },
-  { id: "c2000", amount: 2000, price: 94.90, tier: "popular", badge: "POPULAR", buttonColor: "from-[#d4af37] via-[#e8c84a] to-[#8b7021]" },
-  { id: "c1500", amount: 1500, price: 79.90, tier: "featured", buttonColor: "from-blue-600 via-blue-500 to-blue-700" },
-  { id: "c10000", amount: 10000, price: 349.90, tier: "bestValue", badge: "MELHOR CUSTO BENEFÍCIO", buttonColor: "from-red-600 via-red-500 to-red-700" },
+  { id: "c5000", amount: 5000, price: 199.90, tier: "popular", badge: "POPULAR", buttonColor: "from-purple-600 via-purple-500 to-purple-700" },
+  { id: "c2000", amount: 2000, price: 94.90, tier: "featured", buttonColor: "from-[#d4af37] via-[#e8c84a] to-[#8b7021]" },
+  { id: "c1500", amount: 1500, price: 79.90, tier: "bestValue", badge: "MELHOR CUSTO-BENEFÍCIO", buttonColor: "from-blue-600 via-blue-500 to-blue-700" },
+  { id: "c10000", amount: 10000, price: 349.90, tier: "featured", buttonColor: "from-red-600 via-red-500 to-red-700" },
 ];
 
 const secondaryPackages: CoinPackage[] = [
@@ -68,7 +68,7 @@ const GoldButton = styled.button<{ $text?: string }>`
 
   &::before {
     position: absolute;
-    content: "${({ $text }) => $text || 'COMPRAR AGORA'}";
+    content: "${({ $text }) => $text || 'DOAR AGORA'}";
     color: #ffd277;
     display: flex;
     align-items: center;
@@ -102,7 +102,7 @@ const GoldButtonSmall = styled(GoldButton)`
   letter-spacing: 2px;
 
   &::before {
-    content: "${({ $text }) => $text || 'COMPRAR'}";
+    content: "${({ $text }) => $text || 'DOAR'}";
   }
 `;
 
@@ -111,7 +111,7 @@ interface AtlasGoldenAProps {
   className?: string;
 }
 
-function AtlasGoldenA({ size = 180, className = "" }: AtlasGoldenAProps) {
+export function AtlasGoldenA({ size = 180, className = "" }: AtlasGoldenAProps) {
   return (
     <div
       className={`relative select-none flex items-center justify-center shrink-0 ${className}`}
@@ -311,40 +311,13 @@ function FeaturedCard({ pkg, index, promo, allPromoInfo }: { pkg: CoinPackage; i
             <div className="font-orbitron font-black text-5xl text-white tracking-tight leading-none mb-1">
               {pkg.amount.toLocaleString("pt-BR")}
             </div>
-            <div className="text-[12px] font-semibold text-[#d4af37]/60 uppercase tracking-[0.2em] mb-4">
+            <div className="text-[12px] font-semibold text-[#d4af37]/60 uppercase tracking-[0.2em]">
               Atlas
             </div>
           </div>
 
-          {/* Promotion badge - specific promo only */}
-          {promo && (
-            <div className="flex justify-center mb-4">
-              <div className="relative px-4 py-2 rounded-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-emerald-400/10 to-emerald-500/20 border border-emerald-500/30 rounded-xl" />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/5 to-transparent animate-[shimmer_2s_ease-in-out_infinite]" />
-                <div className="relative flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">{pricing.discountLabel}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ALL promo info badge */}
-          {showAllPromoBadge && (
-            <div className="flex justify-center mb-4">
-              <div className="px-4 py-2 rounded-xl border border-[#d4af37]/20 bg-[#d4af37]/5">
-                <span className="text-[10px] font-bold text-[#d4af37]/70 uppercase tracking-wider">
-                  {allPromoInfo?.discountLabel} • {allPromoInfo?.minOrderLabel}{allPromoInfo?.paymentLabel ? ` • ${allPromoInfo.paymentLabel}` : ""}
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* Price */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <div className="inline-flex items-baseline gap-1">
               {promo ? (
                 <>
@@ -358,6 +331,32 @@ function FeaturedCard({ pkg, index, promo, allPromoInfo }: { pkg: CoinPackage; i
                 </>
               )}
             </div>
+          </div>
+
+          {/* Promo badges - above button */}
+          <div className="space-y-2 mb-4">
+            {/* Specific promo badge */}
+            {promo && (
+              <div className="flex justify-center">
+                <div className="relative px-3 py-1.5 rounded-lg overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-emerald-400/10 to-emerald-500/20 border border-emerald-500/30 rounded-lg" />
+                  <div className="relative flex items-center gap-1.5">
+                    <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    <span className="text-[9px] font-bold text-emerald-300 uppercase tracking-wider">{pricing.discountLabel}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* ALL promo badge */}
+            {showAllPromoBadge && (
+              <div className="flex justify-center">
+                <div className="px-3 py-1.5 rounded-lg border border-[#d4af37]/20 bg-[#d4af37]/5">
+                  <span className="text-[9px] font-bold text-[#d4af37]/70 uppercase tracking-wider">
+                    {allPromoInfo?.discountLabel} • {allPromoInfo?.minOrderLabel}{allPromoInfo?.paymentLabel ? ` • ${allPromoInfo.paymentLabel}` : ""}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Button - Gold Styled */}
@@ -414,12 +413,12 @@ function SecondaryCard({ pkg, index, promo, allPromoInfo }: { pkg: CoinPackage; 
           <div className="font-orbitron font-black text-3xl text-white tracking-tight leading-none mb-1">
             {pkg.amount.toLocaleString("pt-BR")}
           </div>
-          <div className="text-[11px] font-semibold text-[#d4af37]/50 uppercase tracking-[0.15em] mb-4">
+          <div className="text-[11px] font-semibold text-[#d4af37]/50 uppercase tracking-[0.15em]">
             Atlas
           </div>
 
           {/* Price */}
-          <div className="mb-5">
+          <div className="mb-3">
             {promo ? (
               <>
                 <span className="text-sm text-white/30 font-medium mr-0.5 line-through">R$ {pricing.original.toFixed(2).replace(".", ",")}</span>
@@ -430,12 +429,21 @@ function SecondaryCard({ pkg, index, promo, allPromoInfo }: { pkg: CoinPackage; 
               <>
                 <span className="text-sm text-white/30 font-medium mr-0.5">R$</span>
                 <span className="font-orbitron font-bold text-3xl text-white">{pkg.price.toFixed(2).replace(".", ",")}</span>
-                {showAllPromoBadge && allPromoInfo && (
-                  <span className="block text-[10px] font-bold text-[#d4af37]/60 mt-0.5">
+              </>
+            )}
+          </div>
+
+          {/* Promo badges - above button */}
+          <div className="space-y-1.5 mb-3">
+            {/* ALL promo badge */}
+            {showAllPromoBadge && allPromoInfo && (
+              <div className="flex justify-center">
+                <div className="px-2.5 py-1 rounded-md border border-[#d4af37]/20 bg-[#d4af37]/5">
+                  <span className="text-[8px] font-bold text-[#d4af37]/70 uppercase tracking-wider">
                     {allPromoInfo.discountLabel} • {allPromoInfo.minOrderLabel}{allPromoInfo.paymentLabel ? ` • ${allPromoInfo.paymentLabel}` : ""}
                   </span>
-                )}
-              </>
+                </div>
+              </div>
             )}
           </div>
 
@@ -480,11 +488,11 @@ export default function PaginaAtlasCoins() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen bg-gradient-to-br from-[#05080F] via-[#0B1725] to-[#05080F]">
       {/* Background texture */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b] via-[#0c0c10] to-[#09090b]" />
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `radial-gradient(circle at 20% 50%, rgba(212,175,55,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(212,175,55,0.08) 0%, transparent 40%)` }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 20% 50%, rgba(212,175,55,0.25) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(212,175,55,0.15) 0%, transparent 40%)` }} />
       </div>
 
       <div className="relative z-10">
@@ -499,10 +507,10 @@ export default function PaginaAtlasCoins() {
                 {/* Shield - 100% segura */}
                 <div className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/20 flex items-center justify-center group-hover:border-[#d4af37]/40 transition-all duration-300">
-                    <svg className="w-6 h-6 text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    <span className="text-xl">✓</span>
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">100% segura e confiável</p>
+                    <p className="text-white font-semibold text-sm">100% Segura e Confiável</p>
                     <p className="text-white/40 text-xs">Compra protegida</p>
                   </div>
                 </div>
@@ -510,10 +518,10 @@ export default function PaginaAtlasCoins() {
                 {/* Lightning - Automática */}
                 <div className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/20 flex items-center justify-center group-hover:border-[#d4af37]/40 transition-all duration-300">
-                    <svg className="w-6 h-6 text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span className="text-xl">⚡</span>
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">Automática e imediata</p>
+                    <p className="text-white font-semibold text-sm">Automática e Imediata</p>
                     <p className="text-white/40 text-xs">Entrega instantânea</p>
                   </div>
                 </div>
@@ -521,10 +529,10 @@ export default function PaginaAtlasCoins() {
                 {/* Gift - Exclusivos */}
                 <div className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/20 flex items-center justify-center group-hover:border-[#d4af37]/40 transition-all duration-300">
-                    <svg className="w-6 h-6 text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>
+                    <span className="text-xl">🎁</span>
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">Exclusivos na cidade</p>
+                    <p className="text-white font-semibold text-sm">Exclusivos na Cidade</p>
                     <p className="text-white/40 text-xs">Conteúdo premium</p>
                   </div>
                 </div>
@@ -532,10 +540,10 @@ export default function PaginaAtlasCoins() {
                 {/* Crown - Investimento */}
                 <div className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/20 flex items-center justify-center group-hover:border-[#d4af37]/40 transition-all duration-300">
-                    <svg className="w-6 h-6 text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 3l4 5 4-3 4 3 4-5v14H5V3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M5 21h14" /></svg>
+                    <span className="text-xl">👑</span>
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">Investimento que eleva sua jornada</p>
+                    <p className="text-white font-semibold text-sm">Investimento que Eleva sua Jornada</p>
                     <p className="text-white/40 text-xs">Evolua no jogo</p>
                   </div>
                 </div>
@@ -545,12 +553,15 @@ export default function PaginaAtlasCoins() {
               <div className="text-center lg:w-1/3">
                 <div className="inline-flex items-center gap-3 mb-6">
                   <div className="w-10 h-px bg-[#d4af37]/40" />
-                  <span className="text-[10px] font-bold text-[#d4af37]/70 uppercase tracking-[0.3em]">Loja Oficial</span>
+                  <span className="text-[14px] font-bold text-[#d4af37]/70 uppercase tracking-[0.3em]">Apoie o Atlas RP</span>
                   <div className="w-10 h-px bg-[#d4af37]/40" />
                 </div>
                 <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
-                  COMPRE <span className="text-[#d4af37]">ATLAS</span> E IMPULSIONE SUA <span className="text-[#d4af37]">EXPERIÊNCIA!</span>
+                  APOIE O SERVIDOR E RECEBA <span className="text-[#d4af37]">ATLAS</span> COMO AGRADECIMENTO!
                 </h1>
+                <p className="text-white/50 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+                  Seu apoio mantém a cidade no ar — servidores, infraestrutura e novidades para toda a comunidade. Em retribuição, você recebe Atlas para usar dentro do jogo.
+                </p>
               </div>
 
               {/* Right: Logo + Coin */}
@@ -611,7 +622,7 @@ export default function PaginaAtlasCoins() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {/* Payment Methods */}
               <div className="rounded-2xl border border-[#d4af37]/15 bg-gradient-to-br from-[#131318] to-[#0B0B0B] p-6 backdrop-blur-xl">
-                <h3 className="font-orbitron text-sm font-bold text-[#d4af37] uppercase tracking-wider mb-4">Formas de Pagamento</h3>
+                <h3 className="font-orbitron text-sm font-bold text-[#d4af37] uppercase tracking-wider mb-4">Formas de Apoio</h3>
                 <div className="space-y-4">
                   {/* Credit Card */}
                   <div className="flex items-center gap-3">
@@ -630,7 +641,7 @@ export default function PaginaAtlasCoins() {
                     </div>
                     <div>
                       <p className="text-white text-sm font-semibold">PIX</p>
-                      <p className="text-emerald-400/70 text-xs font-semibold">10% OFF acima de R$ 99,90</p>
+                      <p className="text-emerald-400/70 text-xs font-semibold">10% a mais acima de R$ 99,90</p>
                     </div>
                   </div>
                 </div>
@@ -641,7 +652,7 @@ export default function PaginaAtlasCoins() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border-2 border-[#d4af37]/30 flex items-center justify-center">
                   <svg className="w-8 h-8 text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
-                <h3 className="font-orbitron text-sm font-bold text-[#d4af37] uppercase tracking-wider mb-2">SUA COMPRA É PROTEGIDA!</h3>
+                <h3 className="font-orbitron text-sm font-bold text-[#d4af37] uppercase tracking-wider mb-2">SEU APOIO É PROTEGIDO!</h3>
                 <p className="text-white/50 text-xs leading-relaxed">Ambiente 100% seguro, dados protegidos, entrega automática.</p>
               </div>
 
@@ -660,7 +671,7 @@ export default function PaginaAtlasCoins() {
             {/* Final Bar */}
             <div className="rounded-2xl border border-[#d4af37]/20 bg-gradient-to-r from-[#131318] via-[#1a1714] to-[#131318] p-6 text-center backdrop-blur-xl">
               <p className="font-orbitron text-sm md:text-base font-bold text-white mb-4 tracking-wide">
-                COMPRE COM SEGURANÇA, RAPIDEZ E ECONOMIZE!
+                APOIE COM SEGURANÇA, RAPIDEZ E FAÇA PARTE DESSA JORNADA!
               </p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <span className="text-white/50 text-sm">DÚVIDAS?</span>

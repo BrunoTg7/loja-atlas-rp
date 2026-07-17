@@ -9,10 +9,10 @@ export default function HistoriaPage() {
   const bgOpacity = useTransform(scrollYProgress, [0, 0.3], [0.15, 0.03]);
 
   return (
-    <div ref={containerRef} className="min-h-screen">
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]">
       {/* ═══ HERO CINEMÁTICO ═══ */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden -mt-16">
-        <div className="absolute inset-0 bg-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 50% 30%, rgba(212,175,55,0.25) 0%, transparent 50%)` }} />
         <motion.div className="absolute inset-0 bg-[url('/Imagens/fundo1.webp')] bg-cover bg-center" style={{ opacity: bgOpacity }} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#05080F] via-transparent to-[#05080F]" />
 
@@ -76,7 +76,7 @@ as outras&rdquo;
 
       {/* ═══ PRÓLOGO — TEXTO CINEMÁTICO ═══ */}
       <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#0a0e17] to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(circle at 50% 50%, rgba(212,175,55,0.2) 0%, transparent 60%)` }} />
 
         <div className="relative max-w-3xl mx-auto space-y-24">
           {/* Bloco 1 */}
@@ -128,8 +128,7 @@ as outras&rdquo;
      
 
       {/* ═══ CAPÍTULO I — ESTILO MANUSCRITO ═══ */}
-      <section className="relative  px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F] via-[#080c14] to-[#05080F]" />
+      <section className="relative px-6">
 
         <div className="relative max-w-3xl mx-auto">
           <motion.div
@@ -182,7 +181,6 @@ as outras&rdquo;
 
       {/* ═══ CONTINUAÇÃO EM BREVE ═══ */}
       <section className="relative py-24 px-6">
-        <div className="absolute inset-0 bg-[#05080F]" />
 
         <div className="relative max-w-3xl mx-auto text-center">
           <motion.div

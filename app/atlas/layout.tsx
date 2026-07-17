@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Atlas Coins | Loja Atlas RP",
-  description: "Adquira Atlas Coins e desbloqueie itens exclusivos, veículos e planos VIP no servidor Atlas RP.",
+  title: "Atlas RP - Doações",
+  description: "Adquira Atlas e desbloqueie itens exclusivos, veículos e planos VIP no servidor Atlas RP.",
   robots: {
     index: false,
     follow: false,
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     canonical: "https://loja-atlas-rp.vercel.app/atlas",
   },
   openGraph: {
-    title: "Atlas Coins | Loja Atlas RP",
-    description: "Adquira Atlas Coins e desbloqueie itens exclusivos no Atlas RP.",
+    title: "Atlas RP - Doações",
+    description: "Adquira Atlas e desbloqueie itens exclusivos no Atlas RP.",
     url: "https://loja-atlas-rp.vercel.app/atlas",
   },
 };

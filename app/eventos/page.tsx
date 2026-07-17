@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import BaseModal from "@/components/BaseModal";
 
 interface FormField {
   id: string;
@@ -123,11 +124,12 @@ export default function EventosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F121B] via-[#0B1725] to-[#05080F]">
+    <div className="min-h-screen bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]">
       {/* Hero */}
       <section className="relative pt-32 pb-16 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/Imagens/fundo1.webp')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F121B]/80 via-[#0B1725]/90 to-[#05080F]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F]/80 via-[#0B1725]/90 to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 50% 30%, rgba(212,175,55,0.25) 0%, transparent 50%)` }} />
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div {...fadeUp}>
             <h1 className="font-cinzel text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#C9A227] to-[#8B6914] mb-4">
@@ -222,20 +224,20 @@ export default function EventosPage() {
 
       {/* Modal de Inscrição */}
       {eventoSelecionado && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setEventoSelecionado(null)} />
-          <div className="relative bg-[#0c0c10] border border-[#d4af37]/20 rounded-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto flex flex-col md:flex-row">
+        <BaseModal
+          open={!!eventoSelecionado}
+          onClose={() => setEventoSelecionado(null)}
+          title={eventoSelecionado.name}
+          maxWidth="5xl"
+          icon={
+            <svg className="w-5 h-5 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+          }
+        >
+          <div className="flex flex-col md:flex-row gap-6 -mx-2">
             {/* Lado Esquerdo - Info do Evento */}
-            <div className="md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-white/10">
-              <button
-                onClick={() => setEventoSelecionado(null)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors z-10"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-
+            <div className="md:w-1/2 md:border-r border-white/10 md:pr-6">
               {eventoSelecionado.image_url && (
                 <div className="h-48 md:h-56 rounded-xl overflow-hidden mb-4">
                   <img
@@ -247,7 +249,6 @@ export default function EventosPage() {
               )}
 
               <div className="flex items-center gap-3 mb-3">
-                <h3 className="font-cinzel text-2xl font-bold text-white">{eventoSelecionado.name}</h3>
                 {(() => {
                   const status = getEventStatus(eventoSelecionado.start_date, eventoSelecionado.end_date);
                   return (
@@ -273,9 +274,9 @@ export default function EventosPage() {
             </div>
 
             {/* Lado Direito - Formulário */}
-            <div className="md:w-1/2 p-6">
+            <div className="md:w-1/2">
               {isEventEnded(eventoSelecionado.end_date) ? (
-                <div className="flex items-center justify-center h-full py-8">
+                <div className="flex items-center justify-center py-8">
                   <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
                       <svg className="w-8 h-8 text-white/30" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -287,7 +288,7 @@ export default function EventosPage() {
                   </div>
                 </div>
               ) : jaInscrito ? (
-                <div className="flex items-center justify-center h-full py-8">
+                <div className="flex items-center justify-center py-8">
                   <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                       <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -299,7 +300,7 @@ export default function EventosPage() {
                   </div>
                 </div>
               ) : enviado ? (
-                <div className="flex items-center justify-center h-full py-8">
+                <div className="flex items-center justify-center py-8">
                   <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                       <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -312,89 +313,89 @@ export default function EventosPage() {
                 </div>
               ) : (
                 <>
-                <div className="mb-4">
-                  <h4 className="font-cinzel text-lg font-bold text-white mb-1">Inscrição</h4>
-                  <p className="font-rajdhani text-white/40 text-xs">Preencha os dados para participar</p>
-                </div>
-                <form onSubmit={handleInscricao} className="space-y-4">
-                  <div>
-                    <label className="block font-rajdhani text-white/60 text-sm mb-1">Nome *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData["nome"] || ""}
-                      onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[#d4af37]/50 transition-colors"
-                      placeholder="Seu nome"
-                    />
+                  <div className="mb-4">
+                    <h4 className="font-cinzel text-lg font-bold text-[#d4af37] mb-1">Inscrição</h4>
+                    <p className="font-rajdhani text-white/40 text-xs">Preencha os dados para participar</p>
                   </div>
-
-                  {eventoSelecionado.form_fields?.map((field) => (
-                    <div key={field.id}>
-                      <label className="block font-rajdhani text-white/60 text-sm mb-1">
-                        {field.label} {field.required && "*"}
-                      </label>
-                      {field.type === "textarea" ? (
-                        <textarea
-                          required={field.required}
-                          rows={3}
-                          value={formData[field.id] || ""}
-                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[#d4af37]/50 transition-colors resize-none"
-                          placeholder={`Digite ${field.label.toLowerCase()}`}
-                        />
-                      ) : field.type === "select" ? (
-                        <select
-                          required={field.required}
-                          multiple={field.multiple}
-                          value={field.multiple ? (formData[field.id] ? formData[field.id].split(",") : []) : (formData[field.id] || "")}
-                          onChange={(e) => {
-                            if (field.multiple) {
-                              const selected = Array.from(e.target.selectedOptions, (o) => o.value);
-                              setFormData({ ...formData, [field.id]: selected.join(",") });
-                            } else {
-                              setFormData({ ...formData, [field.id]: e.target.value });
-                            }
-                          }}
-                          className={`w-full px-4 py-2.5 bg-black/90 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[#d4af37]/50 transition-colors ${field.multiple ? "min-h-[80px]" : ""}`}
-                        >
-                          {!field.multiple && <option value="">Selecione...</option>}
-                          {field.options?.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type={field.type === "number" ? "number" : field.type === "email" ? "email" : field.type === "phone" ? "tel" : "text"}
-                          required={field.required}
-                          value={formData[field.id] || ""}
-                          onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[#d4af37]/50 transition-colors"
-                          placeholder={field.type === "email" ? "email@exemplo.com" : field.type === "phone" ? "(00) 00000-0000" : `Digite ${field.label.toLowerCase()}`}
-                        />
-                      )}
+                  <form onSubmit={handleInscricao} className="space-y-4">
+                    <div>
+                      <label className="block font-rajdhani text-white/60 text-sm mb-1">Nome *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData["nome"] || ""}
+                        onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[rgba(201,162,39,0.4)] focus:ring-1 focus:ring-[rgba(201,162,39,0.2)] transition-colors"
+                        placeholder="Seu nome"
+                      />
                     </div>
-                  ))}
 
-                  {erro && (
-                    <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                      <p className="font-rajdhani text-red-400 text-sm">{erro}</p>
-                    </div>
-                  )}
+                    {eventoSelecionado.form_fields?.map((field) => (
+                      <div key={field.id}>
+                        <label className="block font-rajdhani text-white/60 text-sm mb-1">
+                          {field.label} {field.required && "*"}
+                        </label>
+                        {field.type === "textarea" ? (
+                          <textarea
+                            required={field.required}
+                            rows={3}
+                            value={formData[field.id] || ""}
+                            onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[rgba(201,162,39,0.4)] focus:ring-1 focus:ring-[rgba(201,162,39,0.2)] transition-colors resize-none"
+                            placeholder={`Digite ${field.label.toLowerCase()}`}
+                          />
+                        ) : field.type === "select" ? (
+                          <select
+                            required={field.required}
+                            multiple={field.multiple}
+                            value={field.multiple ? (formData[field.id] ? formData[field.id].split(",") : []) : (formData[field.id] || "")}
+                            onChange={(e) => {
+                              if (field.multiple) {
+                                const selected = Array.from(e.target.selectedOptions, (o) => o.value);
+                                setFormData({ ...formData, [field.id]: selected.join(",") });
+                              } else {
+                                setFormData({ ...formData, [field.id]: e.target.value });
+                              }
+                            }}
+                            className={`w-full px-4 py-2.5 bg-black/90 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[rgba(201,162,39,0.4)] focus:ring-1 focus:ring-[rgba(201,162,39,0.2)] transition-colors ${field.multiple ? "min-h-[80px]" : ""}`}
+                          >
+                            {!field.multiple && <option value="">Selecione...</option>}
+                            {field.options?.map((opt) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={field.type === "number" ? "number" : field.type === "email" ? "email" : field.type === "phone" ? "tel" : "text"}
+                            required={field.required}
+                            value={formData[field.id] || ""}
+                            onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-rajdhani text-sm focus:outline-none focus:border-[rgba(201,162,39,0.4)] focus:ring-1 focus:ring-[rgba(201,162,39,0.2)] transition-colors"
+                            placeholder={field.type === "email" ? "email@exemplo.com" : field.type === "phone" ? "(00) 00000-0000" : `Digite ${field.label.toLowerCase()}`}
+                          />
+                        )}
+                      </div>
+                    ))}
 
-                  <button
-                    type="submit"
-                    disabled={enviando}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8941f] text-[#0a0a0a] font-rajdhani font-bold text-sm uppercase tracking-wider hover:from-[#e8c84a] hover:to-[#d4af37] transition-all disabled:opacity-50"
-                  >
-                    {enviando ? "Enviando..." : "Confirmar Inscrição"}
-                  </button>
-                </form>
+                    {erro && (
+                      <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                        <p className="font-rajdhani text-red-400 text-sm">{erro}</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={enviando}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8941f] text-[#0a0a0a] font-rajdhani font-bold text-sm uppercase tracking-wider hover:from-[#e8c84a] hover:to-[#d4af37] transition-all disabled:opacity-50 shadow-[0_2px_12px_rgba(212,175,55,0.25)]"
+                    >
+                      {enviando ? "Enviando..." : "Confirmar Inscrição"}
+                    </button>
+                  </form>
                 </>
               )}
             </div>
           </div>
-        </div>
+        </BaseModal>
       )}
     </div>
   );

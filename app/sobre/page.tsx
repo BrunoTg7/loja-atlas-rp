@@ -43,11 +43,12 @@ export default function SobrePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F121B] via-[#0B1725] to-[#05080F]">
+    <div className="min-h-screen bg-gradient-to-b from-[#05080F] via-[#0B1725] to-[#05080F]">
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/Imagens/fundo1.webp')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F121B]/80 via-[#0B1725]/90 to-[#05080F]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05080F]/80 via-[#0B1725]/90 to-[#05080F]" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle at 50% 30%, rgba(212,175,55,0.25) 0%, transparent 50%)` }} />
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div {...fadeUp}>
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#d4af37] to-[#8b6914] flex items-center justify-center">

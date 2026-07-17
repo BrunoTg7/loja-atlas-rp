@@ -33,10 +33,22 @@
 }
 
 body {
-  background: linear-gradient(135deg, #0F121B 0%, #0B1725 50%, #05080F 100%);
+  background: linear-gradient(135deg, #05080F 0%, #0B1725 40%, #0F121B 60%, #05080F 100%);
   color: var(--foreground);
   font-family: 'Rajdhani', sans-serif;
   min-height: 100vh;
+}
+
+.noise-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
 }
 
 .clip-cut {
@@ -179,4 +191,41 @@ body {
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* Gold scrollbar for modals */
+.scrollbar-gold::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-gold::-webkit-scrollbar-track {
+  background: rgba(201,162,39,0.05);
+  border-radius: 3px;
+}
+
+.scrollbar-gold::-webkit-scrollbar-thumb {
+  background: rgba(201,162,39,0.25);
+  border-radius: 3px;
+}
+
+.scrollbar-gold::-webkit-scrollbar-thumb:hover {
+  background: rgba(201,162,39,0.4);
+}
+
+.scrollbar-gold {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,162,39,0.25) rgba(201,162,39,0.05);
+}
+
+/* Dark select styling */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+select option {
+  background: #0B0F1A;
+  color: #ffffff;
 }

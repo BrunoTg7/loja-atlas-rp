@@ -197,7 +197,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
               onClick={handleCheckout}
               className="w-full h-11 rounded-xl bg-[#d4af37] hover:bg-[#e8c84a] text-[#0a0a0a] text-sm font-bold uppercase tracking-wider transition-colors"
             >
-              {user ? "Finalizar Compra" : "Faça Login para Comprar"}
+              {user ? "Finalizar Doação" : "Faça Login para Doar"}
             </button>
 
             {/* Clear */}

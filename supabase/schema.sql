@@ -27,6 +27,12 @@ CREATE TABLE IF NOT EXISTS orders (
   terms_version         TEXT NOT NULL DEFAULT 'v1.0',
   customer_ip           TEXT,
 
+  -- Dados de contato do checkout
+  discord_id            TEXT,
+  contact_name          TEXT,
+  contact_email         TEXT,
+  contact_phone         TEXT,
+
   created_at            TIMESTAMPTZ DEFAULT NOW(),
   updated_at            TIMESTAMPTZ DEFAULT NOW()
 );
@@ -146,7 +152,11 @@ CREATE OR REPLACE FUNCTION create_order_with_payment(
   p_customer_ip TEXT,
   p_items JSONB,
   p_payment_id TEXT,
-  p_gateway TEXT
+  p_gateway TEXT,
+  p_discord_id TEXT DEFAULT NULL,
+  p_contact_name TEXT DEFAULT NULL,
+  p_contact_email TEXT DEFAULT NULL,
+  p_contact_phone TEXT DEFAULT NULL
 ) RETURNS TEXT AS $$
 BEGIN
   IF p_terms_accepted IS NOT TRUE THEN
@@ -155,11 +165,13 @@ BEGIN
 
   INSERT INTO orders (
     id, user_steam_id, steam_hex, char_id, status, total_cents, currency,
-    customer_name, customer_email, terms_accepted, terms_version, customer_ip
+    customer_name, customer_email, terms_accepted, terms_version, customer_ip,
+    discord_id, contact_name, contact_email, contact_phone
   )
   VALUES (
     p_order_id, p_user_steam_id, p_steam_hex, p_char_id, 'created', p_total_cents, p_currency,
-    p_customer_name, p_customer_email, p_terms_accepted, p_terms_version, p_customer_ip
+    p_customer_name, p_customer_email, p_terms_accepted, p_terms_version, p_customer_ip,
+    p_discord_id, p_contact_name, p_contact_email, p_contact_phone
   );
 
   INSERT INTO order_items (id, order_id, product_id, name, amount, price_cents, type)

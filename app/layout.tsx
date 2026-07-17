@@ -7,6 +7,7 @@ import MarketingNotification from "@/components/MarketingNotification";
 import { SteamProvider } from "@/context/SteamContext";
 import { CartProvider } from "@/context/CartContext";
 import { MarketingProvider } from "@/context/MarketingContext";
+import { DiscordProvider } from "@/context/DiscordContext";
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import DevToolsProtection from "@/components/DevToolsProtection";
 import { anton, cinzel, orbitron, rajdhani } from "./fonts";
@@ -15,7 +16,7 @@ const SITE_URL = "https://loja-atlas-rp.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Atlas RP - Loja Oficial",
+  title: "Atlas RP - Home",
   description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
   applicationName: "Atlas RP",
   authors: [{ name: "Atlas RP" }],
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     icon: "/Imagens/logo-atlas-rp.webp",
   },
   openGraph: {
-    title: "Atlas RP - Loja Oficial",
+    title: "Atlas RP - Home",
     description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
     siteName: "Atlas RP",
     locale: "pt_BR",
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Atlas RP - Loja Oficial",
+    title: "Atlas RP - Home",
     description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
     images: [`${SITE_URL}/Imagens/logo-atlas-rp.webp`],
   },
@@ -104,17 +105,19 @@ export default function RootLayout({
         </a>
         <StyledComponentsRegistry>
           <SteamProvider>
-            <CartProvider>
-              <MarketingProvider>
-                <Header />
-                <main className="flex-1 pt-16">
-                  {children}
-                </main>
-                <ClientFooter />
-                <CookieBanner />
-                <MarketingNotification />
-              </MarketingProvider>
-            </CartProvider>
+            <DiscordProvider>
+              <CartProvider>
+                <MarketingProvider>
+                  <Header />
+                  <main className="flex-1 pt-16">
+                    {children}
+                  </main>
+                  <ClientFooter />
+                  <CookieBanner />
+                  <MarketingNotification />
+                </MarketingProvider>
+              </CartProvider>
+            </DiscordProvider>
           </SteamProvider>
         </StyledComponentsRegistry>
       </body>
