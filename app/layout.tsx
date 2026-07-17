@@ -54,6 +54,21 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Atlas RP",
+  url: SITE_URL,
+  logo: `${SITE_URL}/Imagens/logo-atlas-rp.webp`,
+  description: "Loja oficial do servidor Atlas RP. Adquira planos VIP e veículos exclusivos para GTA RP.",
+  sameAs: [],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    availableLanguage: "Portuguese",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -61,6 +76,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`h-full antialiased ${anton.variable} ${cinzel.variable} ${orbitron.variable} ${rajdhani.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <DevToolsProtection />
         <a
